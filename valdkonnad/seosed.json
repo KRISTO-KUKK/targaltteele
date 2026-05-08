@@ -1,0 +1,342 @@
+[
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/avalik-haldus",
+      "nimi": "Avalik haldus",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/noorsootoo-koordinaator",
+        "https://oskused.ee/ametid/sotsiaaltoospetsialist",
+        "https://oskused.ee/ametid/kultuuri-ja-spordikoordinaator",
+        "https://oskused.ee/ametid/ettevotluskoordinaator",
+        "https://oskused.ee/ametid/ruumilise-keskkonna-planeerija",
+        "https://oskused.ee/ametid/hariduskoordinaator",
+        "https://oskused.ee/ametid/arendusjuht",
+        "https://oskused.ee/ametid/oiguse-spetsialist",
+        "https://oskused.ee/ametid/keskkonnaametnik"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/ehitus",
+      "nimi": "Ehitus",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/porandakatja",
+        "https://oskused.ee/ametid/ehitusmasinate-juht",
+        "https://oskused.ee/ametid/ruumilise-keskkonna-planeerija",
+        "https://oskused.ee/ametid/ehitusinsener",
+        "https://oskused.ee/ametid/ehituse-toojuht",
+        "https://oskused.ee/ametid/plaatija",
+        "https://oskused.ee/ametid/keevitaja",
+        "https://oskused.ee/ametid/kulmatehnik",
+        "https://oskused.ee/ametid/ehituspuusepp"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/energeetika",
+      "nimi": "Energeetika",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/maeinsener",
+        "https://oskused.ee/ametid/maeseadmete-operaator",
+        "https://oskused.ee/ametid/soojusenergeetikainsener",
+        "https://oskused.ee/ametid/elektrik",
+        "https://oskused.ee/ametid/hooneautomaatika-tehnik",
+        "https://oskused.ee/ametid/elektriinsener",
+        "https://oskused.ee/ametid/lohkaja",
+        "https://oskused.ee/ametid/kaevanduse-toodejuhataja",
+        "https://oskused.ee/ametid/kulmatehnik"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/finantsala",
+      "nimi": "Finantsala",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/kliendiandmete-ekspert",
+        "https://oskused.ee/ametid/kindlustusriski-hindaja",
+        "https://oskused.ee/ametid/kliendihaldur",
+        "https://oskused.ee/ametid/riskijuht",
+        "https://oskused.ee/ametid/finantsnoustaja",
+        "https://oskused.ee/ametid/laenuhaldur",
+        "https://oskused.ee/ametid/vastavuskontrolli-ekspert",
+        "https://oskused.ee/ametid/kahjukasitleja",
+        "https://oskused.ee/ametid/rahapesu-tokestamise-ekspert"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/haridus-ja-teadus",
+      "nimi": "Haridus ja teadus",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/sotsiaalpedagoog",
+        "https://oskused.ee/ametid/karjaarispetsialist",
+        "https://oskused.ee/ametid/kooliraamatukoguhoidja",
+        "https://oskused.ee/ametid/lasteaiaopetaja",
+        "https://oskused.ee/ametid/opetaja",
+        "https://oskused.ee/ametid/haridusasutuse-juht",
+        "https://oskused.ee/ametid/raamatukoguhoidja",
+        "https://oskused.ee/ametid/lasteaia-abiopetaja",
+        "https://oskused.ee/ametid/noorsootootaja"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/ilu-ja-heaolu",
+      "nimi": "Ilu ja heaolu",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/jumestaja",
+        "https://oskused.ee/ametid/massoor",
+        "https://oskused.ee/ametid/kulmu-ja-ripsmetehnik",
+        "https://oskused.ee/ametid/tatoveerija",
+        "https://oskused.ee/ametid/florist",
+        "https://oskused.ee/ametid/juuksur",
+        "https://oskused.ee/ametid/kuunetehnik",
+        "https://oskused.ee/ametid/kosmeetik",
+        "https://oskused.ee/ametid/loomamassoor"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/info-ja-kommunikatsioonitehnoloogia",
+      "nimi": "Info- ja kommunikatsioonitehnoloogia",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/ikt-tehnilise-toe-spetsialist",
+        "https://oskused.ee/ametid/elektroonikainsener",
+        "https://oskused.ee/ametid/haridustehnoloog",
+        "https://oskused.ee/ametid/kasutajaliidese-ui-disainer",
+        "https://oskused.ee/ametid/elektroonikatehnik",
+        "https://oskused.ee/ametid/tooteomanik",
+        "https://oskused.ee/ametid/andmebaasi-administraator",
+        "https://oskused.ee/ametid/ikt-susteemide-analuutik",
+        "https://oskused.ee/ametid/kasutajakogemuse-ux-disainer"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/kaevandamine",
+      "nimi": "Kaevandamine",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/lohkaja",
+        "https://oskused.ee/ametid/kaevanduse-toodejuhataja",
+        "https://oskused.ee/ametid/maeseadmete-operaator",
+        "https://oskused.ee/ametid/maeinsener"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/kaitse-ja-turvalisus",
+      "nimi": "Kaitse ja turvalisus",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/turvatootaja",
+        "https://oskused.ee/ametid/patrullpolitseinik",
+        "https://oskused.ee/ametid/sodur",
+        "https://oskused.ee/ametid/vangivalvur",
+        "https://oskused.ee/ametid/vetelpaastja",
+        "https://oskused.ee/ametid/korrakaitseametnik",
+        "https://oskused.ee/ametid/paastja",
+        "https://oskused.ee/ametid/piirivalvur",
+        "https://oskused.ee/ametid/turvasusteemide-tehnik"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/kaubandus",
+      "nimi": "Kaubandus",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/infoleti-tootaja",
+        "https://oskused.ee/ametid/muuja-klienditeenindaja",
+        "https://oskused.ee/ametid/turundusjuht",
+        "https://oskused.ee/ametid/muugijuht",
+        "https://oskused.ee/ametid/kellassepp",
+        "https://oskused.ee/ametid/kaubanduse-tootejuht",
+        "https://oskused.ee/ametid/kingsepp",
+        "https://oskused.ee/ametid/logistik-veokorraldaja",
+        "https://oskused.ee/ametid/kullassepp"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/keskkonnamajandus",
+      "nimi": "Keskkonnamajandus",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/looduskaitsespetsialist",
+        "https://oskused.ee/ametid/keskkonnaseire-spetsialist",
+        "https://oskused.ee/ametid/jaatmekaitlusseadmete-operaator",
+        "https://oskused.ee/ametid/jaatmejaama-operaator",
+        "https://oskused.ee/ametid/ettevotte-keskkonnaspetsialist",
+        "https://oskused.ee/ametid/keskkonnainspektor",
+        "https://oskused.ee/ametid/keskkonnakonsultant",
+        "https://oskused.ee/ametid/keskkonnaanaluutik",
+        "https://oskused.ee/ametid/keskkonnaametnik"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/kinnisvara",
+      "nimi": "Kinnisvara",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/veevargilukksepp",
+        "https://oskused.ee/ametid/kahjuritorjuja",
+        "https://oskused.ee/ametid/kinnisvarahaldur",
+        "https://oskused.ee/ametid/puhastusteenindaja",
+        "https://oskused.ee/ametid/kinnisvaramaakler",
+        "https://oskused.ee/ametid/maakorraldaja",
+        "https://oskused.ee/ametid/korstnapuhkija",
+        "https://oskused.ee/ametid/ventilatsioonisusteemide-tehnik",
+        "https://oskused.ee/ametid/kinnisvarahindaja"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/kultuur-ja-loome",
+      "nimi": "Kultuur ja loome",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/viipekeeletolk",
+        "https://oskused.ee/ametid/fotograaf",
+        "https://oskused.ee/ametid/huvikooli-tantsuopetaja",
+        "https://oskused.ee/ametid/keraamik",
+        "https://oskused.ee/ametid/kultuurikorraldaja",
+        "https://oskused.ee/ametid/kooliraamatukoguhoidja",
+        "https://oskused.ee/ametid/puukasitooline",
+        "https://oskused.ee/ametid/tootedisainer",
+        "https://oskused.ee/ametid/raamatukoguhoidja"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/logistika-ja-transport",
+      "nimi": "Logistika ja transport",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/liikluskorraldaja",
+        "https://oskused.ee/ametid/tuurimees",
+        "https://oskused.ee/ametid/automaaler",
+        "https://oskused.ee/ametid/veoautojuht",
+        "https://oskused.ee/ametid/piloot",
+        "https://oskused.ee/ametid/uhissoidukijuht",
+        "https://oskused.ee/ametid/lennunduse-sideinsener",
+        "https://oskused.ee/ametid/mootorsoidukite-diagnostik",
+        "https://oskused.ee/ametid/lennujuht"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/maamajandus",
+      "nimi": "Maamajandus",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/loomakasvatustootja",
+        "https://oskused.ee/ametid/mesinik",
+        "https://oskused.ee/ametid/loomakasvatustootaja",
+        "https://oskused.ee/ametid/loomakasvataja",
+        "https://oskused.ee/ametid/maastikuehitaja",
+        "https://oskused.ee/ametid/arborist",
+        "https://oskused.ee/ametid/loomamassoor",
+        "https://oskused.ee/ametid/kalakasvataja",
+        "https://oskused.ee/ametid/aednik"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/meedia",
+      "nimi": "Meedia",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/sisulooja",
+        "https://oskused.ee/ametid/kujundusgraafik",
+        "https://oskused.ee/ametid/illustraator",
+        "https://oskused.ee/ametid/stilist",
+        "https://oskused.ee/ametid/graafiline-disainer",
+        "https://oskused.ee/ametid/valgustaja",
+        "https://oskused.ee/ametid/3d-visualiseerija",
+        "https://oskused.ee/ametid/teleoperaator",
+        "https://oskused.ee/ametid/3d-modelleerija"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/personali-ja-administratiivtoo",
+      "nimi": "Personali- ja administratiivtöö",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/matuseburoo-tootaja",
+        "https://oskused.ee/ametid/infoleti-tootaja",
+        "https://oskused.ee/ametid/burooassistent",
+        "https://oskused.ee/ametid/kvaliteedijuht",
+        "https://oskused.ee/ametid/karjaarispetsialist",
+        "https://oskused.ee/ametid/andmesisestaja",
+        "https://oskused.ee/ametid/projektijuht",
+        "https://oskused.ee/ametid/arhiivikorrastaja",
+        "https://oskused.ee/ametid/arhivaar"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/sotsiaaltoo",
+      "nimi": "Sotsiaaltöö",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/abivahendispetsialist",
+        "https://oskused.ee/ametid/tegevusterapeut",
+        "https://oskused.ee/ametid/tegevusjuhendaja",
+        "https://oskused.ee/ametid/sotsiaaltoospetsialist",
+        "https://oskused.ee/ametid/hooldustootaja",
+        "https://oskused.ee/ametid/perenoustaja",
+        "https://oskused.ee/ametid/lapsehoidja",
+        "https://oskused.ee/ametid/asendus-ja-perekodu-kasvataja",
+        "https://oskused.ee/ametid/perelepitaja"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/tervishoid",
+      "nimi": "Tervishoid",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/tegevusterapeut",
+        "https://oskused.ee/ametid/fusioterapeut",
+        "https://oskused.ee/ametid/logopeed",
+        "https://oskused.ee/ametid/operatsioonitoatehnik",
+        "https://oskused.ee/ametid/tegevusjuhendaja",
+        "https://oskused.ee/ametid/hambaraviassistent",
+        "https://oskused.ee/ametid/erakorralise-meditsiini-tehnik",
+        "https://oskused.ee/ametid/hambaarst",
+        "https://oskused.ee/ametid/toitumisterapeut"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/tootmine",
+      "nimi": "Tootmine",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/abipagar",
+        "https://oskused.ee/ametid/pagar",
+        "https://oskused.ee/ametid/keemiatehnoloog",
+        "https://oskused.ee/ametid/moe-ja-tekstiilidisainer",
+        "https://oskused.ee/ametid/ombleja",
+        "https://oskused.ee/ametid/cnc-metallitootluspingi-operaator",
+        "https://oskused.ee/ametid/tootedisainer",
+        "https://oskused.ee/ametid/kulmatehnik",
+        "https://oskused.ee/ametid/kullassepp"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/turism-ja-kulalislahkusteenused",
+      "nimi": "Turism ja külalislahkusteenused",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/koogiabiline",
+        "https://oskused.ee/ametid/baarmen",
+        "https://oskused.ee/ametid/aktiivtegevuste-instruktor",
+        "https://oskused.ee/ametid/puhastusteenindaja",
+        "https://oskused.ee/ametid/giid",
+        "https://oskused.ee/ametid/vastuvotuadministraator",
+        "https://oskused.ee/ametid/kelner",
+        "https://oskused.ee/ametid/abikokk",
+        "https://oskused.ee/ametid/kokk"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/oigus",
+      "nimi": "Õigus",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/prokuror",
+        "https://oskused.ee/ametid/notar",
+        "https://oskused.ee/ametid/valisaudiitor",
+        "https://oskused.ee/ametid/kohtunikuabi",
+        "https://oskused.ee/ametid/oigusassistent",
+        "https://oskused.ee/ametid/jurist",
+        "https://oskused.ee/ametid/advokaat",
+        "https://oskused.ee/ametid/oiguse-spetsialist",
+        "https://oskused.ee/ametid/kohtunik"
+      ]
+    },
+    {
+      "valdkond_id": "https://oskused.ee/toovaldkond/ariarendus",
+      "nimi": "Äriarendus",
+      "ametid_ids": [
+        "https://oskused.ee/ametid/kommunikatsioonispetsialist",
+        "https://oskused.ee/ametid/ostujuht",
+        "https://oskused.ee/ametid/kvaliteedijuht",
+        "https://oskused.ee/ametid/turundusjuht",
+        "https://oskused.ee/ametid/tooteomanik",
+        "https://oskused.ee/ametid/muugijuht",
+        "https://oskused.ee/ametid/kaubanduse-tootejuht",
+        "https://oskused.ee/ametid/projektijuht",
+        "https://oskused.ee/ametid/muugiesindaja"
+      ]
+    }
+  ]

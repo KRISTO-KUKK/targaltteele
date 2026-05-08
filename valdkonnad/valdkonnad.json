@@ -1,0 +1,669 @@
+[
+    {
+      "id": "https://oskused.ee/toovaldkond/avalik-haldus",
+      "nimi": "Avalik haldus",
+      "kirjeldus": "Avalik haldus hõlmab riigiteenistujaid, kohaliku omavalitsuse töötajaid, valitsusnõunikke ja poliitikakujundajaid. See on valdkond, milles töötades on võimalus kaasa rääkida valla, linna või terve riigi käekäiku puudutavates küsimustes, et elu omavalitsuses või riigis tervikuna muutuks paremaks.",
+      "huvid": {
+        "sotsiaalne": 85,
+        "uuriv": 70,
+        "ettevotlik": 65,
+        "loominguline": 40,
+        "susteemne": 85,
+        "praktiline": 60
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 90,
+        "loovus_uldistamine": 65,
+        "analuus_info": 75,
+        "ettevotlikkus_organiseerimine": 75,
+        "kohanemine_toimetulek": 70,
+        "juhtimine_eestvedamine": 80
+      },
+      "tags": [
+        "riigiteadused",
+        "oigus",
+        "juhtimine",
+        "avalik_sektor",
+        "poliitika",
+        "administratsioon"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/ehitus",
+      "nimi": "Ehitus",
+      "kirjeldus": "Ehituse alla kuulub erinevaid tegevusi, sealhulgas uute ehitiste projekteerimine ja ehitamine, vanade hoonete rekonstrueerimine, renoveerimine, lammutamine ning remondi- ja hooldustööd.",
+      "huvid": {
+        "sotsiaalne": 45,
+        "uuriv": 65,
+        "ettevotlik": 70,
+        "loominguline": 55,
+        "susteemne": 80,
+        "praktiline": 90
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 70,
+        "loovus_uldistamine": 60,
+        "analuus_info": 70,
+        "ettevotlikkus_organiseerimine": 75,
+        "kohanemine_toimetulek": 75,
+        "juhtimine_eestvedamine": 65
+      },
+      "tags": [
+        "ehitus",
+        "arhitektuur",
+        "inseneeria",
+        "projekteerimine",
+        "renovatsioon",
+        "tehisintellekt"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/energeetika",
+      "nimi": "Energeetika",
+      "kirjeldus": "Energeetika töövaldkond hõlmab töökohti, mis on seotud energia tootmise, jaotamise ja salvestamisega. Taastuvenergia on aina aktuaalsem teema.",
+      "huvid": {
+        "sotsiaalne": 40,
+        "uuriv": 85,
+        "ettevotlik": 70,
+        "loominguline": 45,
+        "susteemne": 90,
+        "praktiline": 85
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 65,
+        "loovus_uldistamine": 55,
+        "analuus_info": 85,
+        "ettevotlikkus_organiseerimine": 70,
+        "kohanemine_toimetulek": 75,
+        "juhtimine_eestvedamine": 70
+      },
+      "tags": [
+        "energeetika",
+        "tehisintellekt",
+        "taastuvenergia",
+        "fuusika",
+        "elektrotehnika",
+        "keskkond"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/finantsala",
+      "nimi": "Finantsala",
+      "kirjeldus": "Finantsala on valdkond, kus tegeletakse finantsjuhtimise, raamatupidamise ja maksundusega. Olulise osa finantsvaldkonnast moodustab riigirahanduse juhtimine.",
+      "huvid": {
+        "sotsiaalne": 50,
+        "uuriv": 75,
+        "ettevotlik": 80,
+        "loominguline": 30,
+        "susteemne": 85,
+        "praktiline": 70
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 70,
+        "loovus_uldistamine": 50,
+        "analuus_info": 90,
+        "ettevotlikkus_organiseerimine": 80,
+        "kohanemine_toimetulek": 75,
+        "juhtimine_eestvedamine": 75
+      },
+      "tags": [
+        "majandus",
+        "rahandus",
+        "raamatupidamine",
+        "analuus",
+        "ettevotlus",
+        "andmeanaluus"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/haridus-ja-teadus",
+      "nimi": "Haridus ja teadus",
+      "kirjeldus": "Haridus- ja teadusvaldkonnast leiab erineva iseloomuga ameteid, mis on seotud õppimise, õpetamise ja uurimistööga.",
+      "huvid": {
+        "sotsiaalne": 85,
+        "uuriv": 90,
+        "ettevotlik": 50,
+        "loominguline": 70,
+        "susteemne": 70,
+        "praktiline": 65
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 85,
+        "loovus_uldistamine": 75,
+        "analuus_info": 85,
+        "ettevotlikkus_organiseerimine": 65,
+        "kohanemine_toimetulek": 75,
+        "juhtimine_eestvedamine": 70
+      },
+      "tags": [
+        "pedagoogika",
+        "teadus",
+        "uurimistoo",
+        "psuhholoogia",
+        "sotsioloogia",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/ilu-ja-heaolu",
+      "nimi": "Ilu ja heaolu",
+      "kirjeldus": "Ilu ja heaolu valdkond hõlmab mitmesuguseid teenuseid, mis on suunatud inimeste heaolu suurendamisele.",
+      "huvid": {
+        "sotsiaalne": 90,
+        "uuriv": 50,
+        "ettevotlik": 70,
+        "loominguline": 75,
+        "susteemne": 45,
+        "praktiline": 85
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 90,
+        "loovus_uldistamine": 75,
+        "analuus_info": 50,
+        "ettevotlikkus_organiseerimine": 70,
+        "kohanemine_toimetulek": 80,
+        "juhtimine_eestvedamine": 60
+      },
+      "tags": [
+        "ilu",
+        "heaolu",
+        "tervishoiu",
+        "kosmeetika",
+        "masaaz",
+        "klientiteenindus"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/info-ja-kommunikatsioonitehnoloogia",
+      "nimi": "Info- ja kommunikatsioonitehnoloogia",
+      "kirjeldus": "IKT on tihedalt seotud teiste elualadega, vedades eest muudatusi tehnoloogias, mida me kasutame tööl ja vabal ajal.",
+      "huvid": {
+        "sotsiaalne": 45,
+        "uuriv": 90,
+        "ettevotlik": 75,
+        "loominguline": 70,
+        "susteemne": 95,
+        "praktiline": 80
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 65,
+        "loovus_uldistamine": 80,
+        "analuus_info": 90,
+        "ettevotlikkus_organiseerimine": 75,
+        "kohanemine_toimetulek": 85,
+        "juhtimine_eestvedamine": 70
+      },
+      "tags": [
+        "programmeerimine",
+        "tehisintellekt",
+        "andmebaasid",
+        "tarkvarahoid",
+        "disain",
+        "algoritmika"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/kaevandamine",
+      "nimi": "Kaevandamine",
+      "kirjeldus": "Kaevandamise valdkond seondub Eestis eelkõige põlevkiviga. Lisaks põlevkivile kaevandatakse siin ka teisi maavarasid.",
+      "huvid": {
+        "sotsiaalne": 40,
+        "uuriv": 65,
+        "ettevotlik": 60,
+        "loominguline": 25,
+        "susteemne": 75,
+        "praktiline": 90
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 60,
+        "loovus_uldistamine": 40,
+        "analuus_info": 65,
+        "ettevotlikkus_organiseerimine": 65,
+        "kohanemine_toimetulek": 80,
+        "juhtimine_eestvedamine": 65
+      },
+      "tags": [
+        "maavarad",
+        "geoloogia",
+        "tehisintellekt",
+        "inseneeria",
+        "turvalisus",
+        "keskkond"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/kaitse-ja-turvalisus",
+      "nimi": "Kaitse ja turvalisus",
+      "kirjeldus": "Kaitse ja turvalisuse valdkonnas töötavad inimesed annavad iga päev panuse selle nimel, et Eesti oleks kaitstud ning siin oleks hea ja turvaline elada.",
+      "huvid": {
+        "sotsiaalne": 80,
+        "uuriv": 70,
+        "ettevotlik": 60,
+        "loominguline": 30,
+        "susteemne": 80,
+        "praktiline": 85
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 80,
+        "loovus_uldistamine": 55,
+        "analuus_info": 75,
+        "ettevotlikkus_organiseerimine": 75,
+        "kohanemine_toimetulek": 90,
+        "juhtimine_eestvedamine": 75
+      },
+      "tags": [
+        "turvalisus",
+        "politseiameti",
+        "paasteamet",
+        "juhtimine",
+        "kriitiline_motlemine",
+        "oigus"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/kaubandus",
+      "nimi": "Kaubandus",
+      "kirjeldus": "Kaubandus on suur ja lai töövaldkond, mis hõlmab kaupade sisseostu, väljapanekut ja müüki ning klienditeenindust.",
+      "huvid": {
+        "sotsiaalne": 85,
+        "uuriv": 60,
+        "ettevotlik": 85,
+        "loominguline": 65,
+        "susteemne": 70,
+        "praktiline": 75
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 85,
+        "loovus_uldistamine": 70,
+        "analuus_info": 75,
+        "ettevotlikkus_organiseerimine": 80,
+        "kohanemine_toimetulek": 75,
+        "juhtimine_eestvedamine": 75
+      },
+      "tags": [
+        "klientiteenindus",
+        "turundus",
+        "e-kaubandus",
+        "logistika",
+        "majandus",
+        "ettevotlus"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/keskkonnamajandus",
+      "nimi": "Keskkonnamajandus",
+      "kirjeldus": "Keskkonnamajandus tegeleb keskkonna hoidmise ja ressursse säästva majandamisega, hoolitsedes selle eest, et me ei koormaks oma tegevusega loodust.",
+      "huvid": {
+        "sotsiaalne": 70,
+        "uuriv": 85,
+        "ettevotlik": 65,
+        "loominguline": 50,
+        "susteemne": 85,
+        "praktiline": 80
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 75,
+        "loovus_uldistamine": 65,
+        "analuus_info": 80,
+        "ettevotlikkus_organiseerimine": 70,
+        "kohanemine_toimetulek": 75,
+        "juhtimine_eestvedamine": 70
+      },
+      "tags": [
+        "keskkond",
+        "jaatmemajandus",
+        "veemajandus",
+        "jatkusuutlikkus",
+        "geograafia",
+        "loodusteadused"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/kinnisvara",
+      "nimi": "Kinnisvara",
+      "kirjeldus": "Kinnisvara valdkond hõlmab kinnisvaramaaklerite ja kinnisvara heakorra eest vastutavate isikute tööd.",
+      "huvid": {
+        "sotsiaalne": 75,
+        "uuriv": 60,
+        "ettevotlik": 80,
+        "loominguline": 50,
+        "susteemne": 70,
+        "praktiline": 75
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 85,
+        "loovus_uldistamine": 60,
+        "analuus_info": 75,
+        "ettevotlikkus_organiseerimine": 80,
+        "kohanemine_toimetulek": 70,
+        "juhtimine_eestvedamine": 75
+      },
+      "tags": [
+        "kinnisvara",
+        "turundus",
+        "oigus",
+        "juhtimine",
+        "ehitus",
+        "klientiteenindus"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/kultuur-ja-loome",
+      "nimi": "Kultuur ja loome",
+      "kirjeldus": "Kultuuri- ja loomevaldkond hõlmab kujutavat kunsti, kirjandust, muusikat, meelelahutust, disaini ning kultuuripärandi säilitamist.",
+      "huvid": {
+        "sotsiaalne": 70,
+        "uuriv": 65,
+        "ettevotlik": 60,
+        "loominguline": 95,
+        "susteemne": 55,
+        "praktiline": 70
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 75,
+        "loovus_uldistamine": 95,
+        "analuus_info": 70,
+        "ettevotlikkus_organiseerimine": 65,
+        "kohanemine_toimetulek": 70,
+        "juhtimine_eestvedamine": 65
+      },
+      "tags": [
+        "kunstiajalugu",
+        "kiijandus",
+        "muusika",
+        "teatrikool",
+        "disain",
+        "medialiteraarsus"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/logistika-ja-transport",
+      "nimi": "Logistika ja transport",
+      "kirjeldus": "Logistika tegeleb kaupade ladustamise ja liigutamisega punktist A punkti B. Transport ehk inimeste ja kaupade liikumine võib toimuda maismaad pidi, lennukiga ja laevaga.",
+      "huvid": {
+        "sotsiaalne": 60,
+        "uuriv": 65,
+        "ettevotlik": 75,
+        "loominguline": 40,
+        "susteemne": 85,
+        "praktiline": 85
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 70,
+        "loovus_uldistamine": 55,
+        "analuus_info": 80,
+        "ettevotlikkus_organiseerimine": 80,
+        "kohanemine_toimetulek": 80,
+        "juhtimine_eestvedamine": 75
+      },
+      "tags": [
+        "logistika",
+        "transport",
+        "tarne",
+        "robotika",
+        "tehisintellekt",
+        "juhtimine"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/maamajandus",
+      "nimi": "Maamajandus",
+      "kirjeldus": "Maamajandus tegeleb vesiviljeluse, metsanduse, taime- ja loomakasvatusega.",
+      "huvid": {
+        "sotsiaalne": 65,
+        "uuriv": 75,
+        "ettevotlik": 70,
+        "loominguline": 45,
+        "susteemne": 75,
+        "praktiline": 85
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 70,
+        "loovus_uldistamine": 60,
+        "analuus_info": 75,
+        "ettevotlikkus_organiseerimine": 75,
+        "kohanemine_toimetulek": 80,
+        "juhtimine_eestvedamine": 70
+      },
+      "tags": [
+        "maamajandus",
+        "bioloogia",
+        "keskkond",
+        "jatkusuutlikkus",
+        "tehisintellekt",
+        "toiduohutus"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/meedia",
+      "nimi": "Meedia",
+      "kirjeldus": "Meedia töövaldkond hõlmab meediaväljaandeid ja -platvorme, sealhulgas paber- ja digiajalehti, ajakirju, raadiojaamu, televisiooni, veebilehti ja sotsiaalmeediat.",
+      "huvid": {
+        "sotsiaalne": 80,
+        "uuriv": 80,
+        "ettevotlik": 70,
+        "loominguline": 85,
+        "susteemne": 65,
+        "praktiline": 70
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 85,
+        "loovus_uldistamine": 85,
+        "analuus_info": 80,
+        "ettevotlikkus_organiseerimine": 70,
+        "kohanemine_toimetulek": 75,
+        "juhtimine_eestvedamine": 70
+      },
+      "tags": [
+        "ajakirjandus",
+        "meedia",
+        "turundus",
+        "sotsiaalmeedia",
+        "videotootmine",
+        "kommunikatsioon"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/personali-ja-administratiivtoo",
+      "nimi": "Personali- ja administratiivtöö",
+      "kirjeldus": "Personali- ja administratiivtöö valdkonnad mängivad olulist rolli organisatsioonide sujuvas toimimises.",
+      "huvid": {
+        "sotsiaalne": 80,
+        "uuriv": 65,
+        "ettevotlik": 70,
+        "loominguline": 50,
+        "susteemne": 80,
+        "praktiline": 75
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 85,
+        "loovus_uldistamine": 65,
+        "analuus_info": 80,
+        "ettevotlikkus_organiseerimine": 85,
+        "kohanemine_toimetulek": 75,
+        "juhtimine_eestvedamine": 80
+      },
+      "tags": [
+        "personalijuhtimine",
+        "administratsioon",
+        "juhtimine",
+        "dokumentaalsus",
+        "digiharidus",
+        "koolitamine"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/sotsiaaltoo",
+      "nimi": "Sotsiaaltöö",
+      "kirjeldus": "Sotsiaaltöö eesmärk on toetada inimeste heaolu ja igapäevast hakkamasaamist, et ükski ühiskonnaliige ei jääks oma murega üksi.",
+      "huvid": {
+        "sotsiaalne": 95,
+        "uuriv": 70,
+        "ettevotlik": 55,
+        "loominguline": 60,
+        "susteemne": 70,
+        "praktiline": 75
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 95,
+        "loovus_uldistamine": 70,
+        "analuus_info": 75,
+        "ettevotlikkus_organiseerimine": 70,
+        "kohanemine_toimetulek": 85,
+        "juhtimine_eestvedamine": 70
+      },
+      "tags": [
+        "sotsiaalteenused",
+        "psuhholoogia",
+        "empaatia",
+        "perekond",
+        "tervishoiu",
+        "ühiskond"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/tervishoid",
+      "nimi": "Tervishoid",
+      "kirjeldus": "Tervishoiu töövaldkond on keskendunud inimeste ravimisele, tervise hoidmisele ja eluea pikendamisele.",
+      "huvid": {
+        "sotsiaalne": 90,
+        "uuriv": 85,
+        "ettevotlik": 60,
+        "loominguline": 50,
+        "susteemne": 80,
+        "praktiline": 90
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 85,
+        "loovus_uldistamine": 65,
+        "analuus_info": 85,
+        "ettevotlikkus_organiseerimine": 70,
+        "kohanemine_toimetulek": 85,
+        "juhtimine_eestvedamine": 75
+      },
+      "tags": [
+        "meditsiin",
+        "bioloogia",
+        "keemia",
+        "psuhholoogia",
+        "kliiniline_psuhholoogia",
+        "tervishoiu"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/tootmine",
+      "nimi": "Tootmine",
+      "kirjeldus": "Tootmine on Eesti majanduse vedur ja kõige tähtsam sektor, kus valmivad komponendid ja tooted, mida tarnitakse ka teistesse riikidesse.",
+      "huvid": {
+        "sotsiaalne": 50,
+        "uuriv": 75,
+        "ettevotlik": 75,
+        "loominguline": 60,
+        "susteemne": 85,
+        "praktiline": 90
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 70,
+        "loovus_uldistamine": 65,
+        "analuus_info": 80,
+        "ettevotlikkus_organiseerimine": 80,
+        "kohanemine_toimetulek": 80,
+        "juhtimine_eestvedamine": 75
+      },
+      "tags": [
+        "tehisintellekt",
+        "robotika",
+        "inseneeria",
+        "disain",
+        "kvaliteet",
+        "tootmistehnika"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/turism-ja-kulalislahkusteenused",
+      "nimi": "Turism ja külalislahkusteenused",
+      "kirjeldus": "Turism ja külalislahkusteenused pakuvad mitmekülgseid puhkamisvõimalusi ning vaba aja veetmise viise.",
+      "huvid": {
+        "sotsiaalne": 90,
+        "uuriv": 65,
+        "ettevotlik": 75,
+        "loominguline": 75,
+        "susteemne": 65,
+        "praktiline": 80
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 90,
+        "loovus_uldistamine": 80,
+        "analuus_info": 70,
+        "ettevotlikkus_organiseerimine": 80,
+        "kohanemine_toimetulek": 85,
+        "juhtimine_eestvedamine": 75
+      },
+      "tags": [
+        "turism",
+        "hosteldused",
+        "toitlustus",
+        "reisikorraldus",
+        "klientiteenindus",
+        "geograafia"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/oigus",
+      "nimi": "Õigus",
+      "kirjeldus": "Õigusvaldkond reguleerib riigi, inimeste ja ettevõtete jaoks olulisi teemasid, tuginedes kokkulepitud praktikale ja seadustele.",
+      "huvid": {
+        "sotsiaalne": 70,
+        "uuriv": 85,
+        "ettevotlik": 75,
+        "loominguline": 45,
+        "susteemne": 85,
+        "praktiline": 70
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 80,
+        "loovus_uldistamine": 65,
+        "analuus_info": 90,
+        "ettevotlikkus_organiseerimine": 75,
+        "kohanemine_toimetulek": 75,
+        "juhtimine_eestvedamine": 75
+      },
+      "tags": [
+        "oigus",
+        "etsika",
+        "riigioigus",
+        "ariooigus",
+        "argumenteerimine",
+        "kommunikatsioon"
+      ]
+    },
+    {
+      "id": "https://oskused.ee/toovaldkond/ariarendus",
+      "nimi": "Äriarendus",
+      "kirjeldus": "Äriarendus hõlmab tegevustena organisatsiooni arengu juhtimist, sh uutele turgudele sisenemist, uute koostööprojektide leidmist, toodete müüki ja turundust.",
+      "huvid": {
+        "sotsiaalne": 80,
+        "uuriv": 75,
+        "ettevotlik": 95,
+        "loominguline": 70,
+        "susteemne": 80,
+        "praktiline": 75
+      },
+      "oskused": {
+        "suhtlemine_koostoo": 90,
+        "loovus_uldistamine": 80,
+        "analuus_info": 85,
+        "ettevotlikkus_organiseerimine": 95,
+        "kohanemine_toimetulek": 80,
+        "juhtimine_eestvedamine": 90
+      },
+      "tags": [
+        "ettevotlus",
+        "turundus",
+        "majandus",
+        "juhtimine",
+        "turundusturundus",
+        "strateegia"
+      ]
+    }
+  ]
