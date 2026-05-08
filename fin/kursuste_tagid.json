@@ -1,0 +1,818 @@
+[
+    {
+      "link": "https://keel.ut.ee/et/eesti-keele-kursus-gumnasistidele",
+      "pealkiri": "Tartu Ülikool pakub muu emakeelega gümnasistidele sisseastumiseks ettevalmistavat eesti keele kursust",
+      "tags": [
+        "eesti_keel",
+        "lingvistika",
+        "haridus",
+        "ettevalmistus",
+        "suhtlemine_koostoo",
+        "akadeemiline_kirjutamine"
+      ]
+    },
+    {
+      "link": "https://didaktika.cs.ut.ee/progttl/",
+      "pealkiri": "Programmeerimiskursus \"Tehnoloogia tarbijast loojaks\"",
+      "tags": [
+        "programmeerimine",
+        "algoritm",
+        "Python",
+        "tarkvaraarendus",
+        "probleemilahendus",
+        "ettevalmistus"
+      ]
+    },
+    {
+      "link": "https://sisu.ut.ee/ravimitest-maakeeli/",
+      "pealkiri": "Ravimeid maakeeli",
+      "tags": [
+        "meditsiin",
+        "farmaatsia",
+        "tervishoid",
+        "biokeemia",
+        "teaduskommunikatsioon",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://www.is.ut.ee/pls/ois/!tere.tulemast?leht=OK.AY.VP&id_ay_programm=54181&id_ay_toimumine=69379&systeemi_seaded=10,1,12,1,",
+      "pealkiri": "SVPH.TK.111 Teadlikult tulevikku - minu karjääriplaan",
+      "tags": [
+        "psuhholoogia",
+        "karjääriplaneerimis",
+        "ettevotlikkus_organiseerimine",
+        "loovus_uldistamine",
+        "enese_arendus",
+        "tulevikuplaaneerimine"
+      ]
+    },
+    {
+      "link": "https://sisu.ut.ee/oigusealused/",
+      "pealkiri": "TÜ õigusteaduskonna e-kursus \"Õiguse alused mittejuristile\"",
+      "tags": [
+        "oigus",
+        "riigioigus",
+        "etsika",
+        "haridus",
+        "kriitiline_motlemine",
+        "argumenteerimine"
+      ]
+    },
+    {
+      "link": "https://blog.keel.ut.ee/eesti-keele-eksam/2022/",
+      "pealkiri": "Eesti keele riigieksami ettevalmistuskursus: 24 sammuga enesekindlaks eksaminandiks",
+      "tags": [
+        "eesti_keel",
+        "akadeemiline_kirjutamine",
+        "lugemine",
+        "suhtlemine_koostoo",
+        "ettevalmistus",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://ut.ee/et/eksamiteks-ettevalmistavad-kursused-pohikooli-ja-gumnaasiumiopilastele",
+      "pealkiri": "Keemia kursus gümnaasiumiõpilastele",
+      "tags": [
+        "keemia",
+        "orgaaniline_keemia",
+        "anorgaaniline_keemia",
+        "laboritoo",
+        "ettevalmistus",
+        "probleemilahendus"
+      ]
+    },
+    {
+      "link": "https://ut.ee/et/eksamiteks-ettevalmistavad-kursused-pohikooli-ja-gumnaasiumiopilastele",
+      "pealkiri": "Keemia kursus põhikooliõpilastele",
+      "tags": [
+        "keemia",
+        "anorgaaniline_keemia",
+        "laboritoo",
+        "ettevalmistus",
+        "probleemilahendus",
+        "andmeanaluus"
+      ]
+    },
+    {
+      "link": "https://ut.ee/et/eksamiteks-ettevalmistavad-kursused-pohikooli-ja-gumnaasiumiopilastele",
+      "pealkiri": "Füüsika kursus gümnaasiumiõpilastele",
+      "tags": [
+        "fuusika",
+        "mehaanika",
+        "optika",
+        "elektromagnetism",
+        "ettevalmistus",
+        "probleemilahendus"
+      ]
+    },
+    {
+      "link": "https://ut.ee/et/eksamiteks-ettevalmistavad-kursused-pohikooli-ja-gumnaasiumiopilastele",
+      "pealkiri": "Eesti keele teise keelena tugiõppe veebipõhised ülesanded põhikooli III astmele",
+      "tags": [
+        "eesti_keel",
+        "keele_opetimine",
+        "lugemine",
+        "kirjutamine",
+        "kuulamine",
+        "ettevalmistus"
+      ]
+    },
+    {
+      "link": "https://ut.ee/et/eksamiteks-ettevalmistavad-kursused-pohikooli-ja-gumnaasiumiopilastele",
+      "pealkiri": "Matemaatika riigieksamiks ettevalmistav kursus",
+      "tags": [
+        "matemaatika",
+        "algebra",
+        "geomeetria",
+        "analüüs",
+        "ettevalmistus",
+        "probleemilahendus"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/dna-ja-valkude-jarjestuste-analuus-bioinformaatikas/",
+      "pealkiri": "DNA ja valkude järjestuste analüüs bioinformaatikas",
+      "tags": [
+        "bioloogia",
+        "geneetika",
+        "rakubioloogia",
+        "bioinformaatika",
+        "andmeanaluus",
+        "uurimistoo"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/uus-robotjalgpall/",
+      "pealkiri": "UUS! Robotjalgpall",
+      "tags": [
+        "robootika",
+        "informaatika",
+        "programmeerimine",
+        "inseneeria",
+        "probleemilahendus",
+        "meeskonnatoo"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/praktiline-kodukeemia-ii/",
+      "pealkiri": "Praktiline kodukeemia II",
+      "tags": [
+        "keemia",
+        "laboritoo",
+        "eksperimenteerimine",
+        "probleemilahendus",
+        "kriitiline_motlemine",
+        "andmeanaluus"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/pillide-tundmine-parmupillist-orelini/",
+      "pealkiri": "Pillide tundmine parmupillist orelini",
+      "tags": [
+        "muusika",
+        "muusikaajalugu",
+        "pillimang",
+        "kultuurilugu",
+        "kriitiline_motlemine",
+        "silmaringi_laiendus"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/gumnaasiumi-loodusainete-valdkonna-valikkursus-geoinformaatika/",
+      "pealkiri": "Gümnaasiumi loodusainete valdkonna valikkursus: Geoinformaatika",
+      "tags": [
+        "geograafia",
+        "geoinformaatika",
+        "informaatika",
+        "andmebaasid",
+        "kartograafia",
+        "matemaatika"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/taiendavaid-teemasid-koolikeemiale-ii/",
+      "pealkiri": "Täiendavaid teemasid koolikeemiale II",
+      "tags": [
+        "keemia",
+        "termodunaamika",
+        "probleemilahendus",
+        "matemaatika",
+        "andmeanaluus",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/uus-tehisaru/",
+      "pealkiri": "UUS! Tehisaru",
+      "tags": [
+        "tehisintellekt",
+        "informaatika",
+        "algoritm",
+        "masinope",
+        "eetika",
+        "filosoofia"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/antiikaja-kultuuriparand/",
+      "pealkiri": "Antiikaja kultuuripärand",
+      "tags": [
+        "ajalugu",
+        "kunstiajalugu",
+        "kultuurilugu",
+        "ladina_keel",
+        "kirjandus",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/geneetika-ja-evolutsioon/",
+      "pealkiri": "Geneetika ja evolutsioon",
+      "tags": [
+        "bioloogia",
+        "geneetika",
+        "evolutsioon",
+        "molekulaaribioloogia",
+        "uurimistoo",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/inimese-anatoomia-ja-fusioloogia/",
+      "pealkiri": "Inimkeha ABC",
+      "tags": [
+        "anatoomia",
+        "fusioloogia",
+        "bioloogia",
+        "meditsiin",
+        "tervishoid",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/vana-egiptus-ja-tanapaev/",
+      "pealkiri": "Vana-Egiptus ja tänapäev",
+      "tags": [
+        "ajalugu",
+        "maailma_ajalugu",
+        "arheoloogia",
+        "kunstiajalugu",
+        "kultuurilugu",
+        "uurimistoo"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/praktiline-kodukeemia/",
+      "pealkiri": "Praktiline kodukeemia I",
+      "tags": [
+        "keemia",
+        "laboritoo",
+        "eksperimenteerimine",
+        "probleemilahendus",
+        "turvalisus",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/rahvusvaheliste-suhete-alused/",
+      "pealkiri": "Rahvusvaheliste suhete alused",
+      "tags": [
+        "rahvusvahelised_suhted",
+        "riigiteadused",
+        "politoloogia",
+        "geograafia",
+        "ajalugu",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/ettevalmistus-keemiaolumpiaadiks-iii/",
+      "pealkiri": "Ettevalmistus keemiaolümpiaadiks III",
+      "tags": [
+        "keemia",
+        "orgaaniline_keemia",
+        "anorgaaniline_keemia",
+        "probleemilahendus",
+        "matemaatika",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/voistlusprogrammeerimine-ii/",
+      "pealkiri": "Võistlusprogrammeerimine II",
+      "tags": [
+        "programmeerimine",
+        "algoritm",
+        "diskreetne_matemaatika",
+        "andmebaasid",
+        "probleemilahendus",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/uus-fpv-droonilennu-baaskursus/",
+      "pealkiri": "UUS! FPV droonilennu baaskursus",
+      "tags": [
+        "robootika",
+        "informaatika",
+        "inseneeria",
+        "fuusika",
+        "praktiline",
+        "meeskonnatoo"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/erilised-summad/",
+      "pealkiri": "Erilised summad",
+      "tags": [
+        "matemaatika",
+        "algebra",
+        "matemaatiline_analuus",
+        "loogika",
+        "probleemilahendus",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/linnaplaneerimine/",
+      "pealkiri": "Linnaplaneerimine",
+      "tags": [
+        "geograafia",
+        "arhitektuur",
+        "keskkonnakaitse",
+        "juhtimine",
+        "disain",
+        "uurimistoo"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/ettevalmistus-fuusikaolumpiaadiks/",
+      "pealkiri": "Ettevalmistus põhikooli füüsikaolümpiaadiks",
+      "tags": [
+        "fuusika",
+        "mehaanika",
+        "optika",
+        "elektromagnetism",
+        "matemaatika",
+        "probleemilahendus"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/taiendavaid-teemasid-koolimatemaatikale-i/",
+      "pealkiri": "Täiendavaid teemasid koolimatemaatikale",
+      "tags": [
+        "matemaatika",
+        "algebra",
+        "geomeetria",
+        "arvuteooria",
+        "loogika",
+        "probleemilahendus"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/eureka-start/",
+      "pealkiri": "Eureka Start",
+      "tags": [
+        "loodusteadused",
+        "bioloogia",
+        "keemia",
+        "fuusika",
+        "geograafia",
+        "uurimistoo"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/loodusteadlike-ulesannete-lahendamine/",
+      "pealkiri": "Loodusteaduslike ülesannete lahendamine",
+      "tags": [
+        "loodusteadused",
+        "bioloogia",
+        "keemia",
+        "fuusika",
+        "matemaatika",
+        "laboritoo"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/anatoomia-ja-fusioloogia/",
+      "pealkiri": "Anatoomia ja füsioloogia",
+      "tags": [
+        "anatoomia",
+        "fusioloogia",
+        "bioloogia",
+        "meditsiin",
+        "tervishoid",
+        "toitumisteadus"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/ettevalmistus-keemiaolumpiaadiks-ii/",
+      "pealkiri": "Ettevalmistus keemiaolümpiaadiks II",
+      "tags": [
+        "keemia",
+        "anorgaaniline_keemia",
+        "analuutiline_keemia",
+        "matemaatika",
+        "probleemilahendus",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/geenid-muudid-ja-tegelikkus/",
+      "pealkiri": "Geenid – müüdid ja tegelikkus",
+      "tags": [
+        "bioloogia",
+        "geneetika",
+        "molekulaaribioloogia",
+        "rakubioloogia",
+        "kriitiline_motlemine",
+        "teaduskommunikatsioon"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/voistlusprogrammeerimine-i/",
+      "pealkiri": "Võistlusprogrammeerimine I",
+      "tags": [
+        "programmeerimine",
+        "algoritm",
+        "diskreetne_matemaatika",
+        "matemaatika",
+        "probleemilahendus",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/rahvusvaheliste-matemaatikavoistluste-treeningkursus/",
+      "pealkiri": "Rahvusvaheliste matemaatikavõistluste treeningkursus",
+      "tags": [
+        "matemaatika",
+        "algebra",
+        "geomeetria",
+        "arvuteooria",
+        "kombinatoorika",
+        "probleemilahendus"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/opioskused-ulikooliks/",
+      "pealkiri": "Õpioskused ülikooliks",
+      "tags": [
+        "pedagoogika",
+        "haridus",
+        "suhtlemine_koostoo",
+        "loovus_uldistamine",
+        "ettevotlikkus_organiseerimine",
+        "kohanemine_toimetulek"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/keemia-alused/",
+      "pealkiri": "Keemia alused",
+      "tags": [
+        "keemia",
+        "anorgaaniline_keemia",
+        "lahused",
+        "matemaatika",
+        "probleemilahendus",
+        "andmeanaluus"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/taiendavaid-teemasid-koolifuusikale-i/",
+      "pealkiri": "Täiendavaid teemasid koolifüüsikale",
+      "tags": [
+        "fuusika",
+        "mehaanika",
+        "termodunaamika",
+        "matemaatika",
+        "probleemilahendus",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/fuusikaolumpiaadi-ettevalmistuskursus/",
+      "pealkiri": "Füüsikaolümpiaadi ettevalmistuskursus (gümnasistile)",
+      "tags": [
+        "fuusika",
+        "mehaanika",
+        "termodunaamika",
+        "elektromagnetism",
+        "optika",
+        "matemaatika"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/rakubioloogia-ja-biokeemia/",
+      "pealkiri": "Rakubioloogia ja biokeemia",
+      "tags": [
+        "bioloogia",
+        "rakubioloogia",
+        "biokeemia",
+        "molekulaaribioloogia",
+        "keemia",
+        "uurimistoo"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/taimeanatoomia/",
+      "pealkiri": "Taimeanatoomia",
+      "tags": [
+        "bioloogia",
+        "anatoomia",
+        "botaanika",
+        "rakubioloogia",
+        "laboritoo",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/astronoomia/",
+      "pealkiri": "Astronoomia",
+      "tags": [
+        "astronoomia",
+        "fuusika",
+        "matemaatika",
+        "kosmoloogia",
+        "teaduslik_meetod",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/inimene-ja-religioon/",
+      "pealkiri": "Inimene ja religioon",
+      "tags": [
+        "religioonilugu",
+        "filosoofia",
+        "eetika",
+        "sotsioloogia",
+        "kultuurilugu",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/voistlusmatemaatika-i/",
+      "pealkiri": "Võistlusmatemaatika I",
+      "tags": [
+        "matemaatika",
+        "algebra",
+        "arvuteooria",
+        "geomeetria",
+        "diskreetne_matemaatika",
+        "probleemilahendus"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/sissejuhatus-laborimeditsiini/",
+      "pealkiri": "Sissejuhatus laborimeditsiini",
+      "tags": [
+        "meditsiin",
+        "laboritoo",
+        "keemia",
+        "bioloogia",
+        "haiguste_diagnostika",
+        "praktiline"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/mateprax-avaldiste-teisendamine/",
+      "pealkiri": "Mateprax: avaldiste teisendamine",
+      "tags": [
+        "matemaatika",
+        "algebra",
+        "probleemilahendus",
+        "kriitiline_motlemine",
+        "harjutamine",
+        "ettevalmistus"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/kosmilisest-kiirgusest-tuumajaamani/",
+      "pealkiri": "Kosmilisest kiirgusest tuumajaamani",
+      "tags": [
+        "fuusika",
+        "kvantfuusika",
+        "keskkonnakaitse",
+        "energia",
+        "turvalisus",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/uus-inglise-keele-lugu/",
+      "pealkiri": "Inglise keele lugu",
+      "tags": [
+        "inglise_keel",
+        "lingvistika",
+        "kirjandus",
+        "kultuurilugu",
+        "keele_ajalugu",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/praktiline-filosoofia/",
+      "pealkiri": "Praktiline filosoofia",
+      "tags": [
+        "filosoofia",
+        "eetika",
+        "argumenteerimine",
+        "kriitiline_motlemine",
+        "arutelu",
+        "moraal"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/imeline-universum/",
+      "pealkiri": "Imeline Universum",
+      "tags": [
+        "astronoomia",
+        "fuusika",
+        "kosmos",
+        "teaduslik_meetod",
+        "silmaringi_laiendus",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/orgaaniline-keemia/",
+      "pealkiri": "Orgaaniline keemia",
+      "tags": [
+        "keemia",
+        "orgaaniline_keemia",
+        "reaktsioonid",
+        "funktsionaalrühmad",
+        "probleemilahendus",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/fuusikalised-mootmised-ja-katsed/",
+      "pealkiri": "Füüsikalised nähtused ja katsed",
+      "tags": [
+        "fuusika",
+        "laboritoo",
+        "eksperimenteerimine",
+        "mõõtmised",
+        "loovus",
+        "probleemilahendus"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/aktiivse-kodaniku-abc/",
+      "pealkiri": "Aktiivse kodaniku ABC",
+      "tags": [
+        "riigiteadused",
+        "politoloogia",
+        "oigus",
+        "sotsioloogia",
+        "ühiskond",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/immunoloogia/",
+      "pealkiri": "Immunoloogia",
+      "tags": [
+        "bioloogia",
+        "meditsiin",
+        "rakubioloogia",
+        "fusioloogia",
+        "haiguste_ennetamine",
+        "uurimistoo"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/programmeerimine-keeltes-c-c-ja-java/",
+      "pealkiri": "Programmeerimine keeltes C/C++ ja Java",
+      "tags": [
+        "programmeerimine",
+        "algoritm",
+        "tarkvaraarendus",
+        "andmebaasid",
+        "matemaatika",
+        "probleemilahendus"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/ettevotlusopetus/",
+      "pealkiri": "Ettevõtlusõpetus",
+      "tags": [
+        "ettevotlus",
+        "majandus",
+        "juhtimine",
+        "turundus",
+        "äriplaneerimine",
+        "meeskonnatoo"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/minu-keha-ja-ravimid/",
+      "pealkiri": "Minu keha ja ravimid",
+      "tags": [
+        "meditsiin",
+        "tervishoid",
+        "farmaatsia",
+        "biokeemia",
+        "teaduskommunikatsioon",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/voistlusmatemaatika-ii/",
+      "pealkiri": "Võistlusmatemaatika II",
+      "tags": [
+        "matemaatika",
+        "algebra",
+        "arvuteooria",
+        "geomeetria",
+        "diskreetne_matemaatika",
+        "probleemilahendus"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/uus-vaartused-voorused-ja-pahed/",
+      "pealkiri": "Väärtused, voorused ja pahed",
+      "tags": [
+        "filosoofia",
+        "eetika",
+        "moraal",
+        "inimväärtused",
+        "arutelu",
+        "kriitiline_motlemine"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/matemaatiline-arutlusoskus-ja-toestamine/",
+      "pealkiri": "Matemaatiline arutlusoskus ja tõestamine",
+      "tags": [
+        "matemaatika",
+        "loogika",
+        "tõestamine",
+        "argumenteerimine",
+        "kriitiline_motlemine",
+        "probleemilahendus"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/voistlusmatemaatika-iii/",
+      "pealkiri": "Võistlusmatemaatika III",
+      "tags": [
+        "matemaatika",
+        "algebra",
+        "arvuteooria",
+        "geomeetria",
+        "diskreetne_matemaatika",
+        "probleemilahendus"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/ettevalmistus-keemiaolumpiaadiks-i/",
+      "pealkiri": "Ettevalmistus keemiaolümpiaadiks I",
+      "tags": [
+        "keemia",
+        "anorgaaniline_keemia",
+        "lahused",
+        "laboritoo",
+        "probleemilahendus",
+        "matemaatika"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/praktiline-analoogfotograafia/",
+      "pealkiri": "Praktiline analoogfotograafia",
+      "tags": [
+        "fotograafia",
+        "fuusika",
+        "keemia",
+        "tehisajalugu",
+        "loovus",
+        "praktiline"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/inimesed-ja-margid-sissejuhatus-semiootikasse/",
+      "pealkiri": "Inimesed ja märgid: sissejuhatus semiootikasse",
+      "tags": [
+        "semiootika",
+        "kultuurilugu",
+        "kommunikatsioon",
+        "sotsioloogia",
+        "kriitiline_motlemine",
+        "tekstianalüüs"
+      ]
+    },
+    {
+      "link": "https://e-oppekeskus.ee/kursused/taiendavaid-teemasid-koolikeemiale/",
+      "pealkiri": "Täiendavaid teemasid koolikeemiale I",
+      "tags": [
+        "keemia",
+        "termodunaamika",
+        "lahused",
+        "redoksreaktsioonid",
+        "matemaatika",
+        "probleemilahendus"
+      ]
+    }
+  ]
