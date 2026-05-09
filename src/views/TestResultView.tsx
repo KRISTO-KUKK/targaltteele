@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Notice } from "../components/Notice";
 import { analyzeTest } from "../utils/api";
-import { mockTestAnalysis } from "../utils/mockAnalyzer";
 import type { TestAnalysis } from "../types";
 
 export function TestResultView({
@@ -10,7 +9,6 @@ export function TestResultView({
   linkLabel,
   linkUrl,
   analyzeLabel,
-  demoLabel,
   skipLabel,
   kind,
   onDone,
@@ -20,7 +18,6 @@ export function TestResultView({
   linkLabel: string;
   linkUrl: string;
   analyzeLabel: string;
-  demoLabel: string;
   skipLabel: string;
   kind: "interests" | "skills";
   onDone: (analysis: TestAnalysis) => void;
@@ -29,22 +26,40 @@ export function TestResultView({
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const isMounted = useRef(true);
+  const requestId = useRef(0);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+      requestId.current += 1;
+    };
+  }, []);
 
   async function analyze() {
+    const activeRequestId = requestId.current + 1;
+    requestId.current = activeRequestId;
+    console.info("[test-result] analyze:start", { at: new Date().toISOString(), kind, textLength: text.length, hasFile: Boolean(file), fileName: file?.name });
     setBusy(true);
     setMessage("");
     try {
       const result = await analyzeTest(kind, text, file);
-      setMessage(result.message ?? (result.source === "mock" ? "AI analüüsi ei saanud hetkel teha. Kasutasime demoandmeid, et prototüübi teekonda saaks edasi vaadata." : ""));
+      if (!isMounted.current || requestId.current !== activeRequestId) return;
+      console.info("[test-result] analyze:result", { at: new Date().toISOString(), kind, scoreCount: result.scores.length, source: result.source, message: result.message });
+      setMessage(result.message ?? (result.source === "mock" ? "AI analüüsi ei saanud hetkel teha. Näidisandmeid ei kasutata; palun proovi uuesti või kleebi testi protsendid tekstina." : ""));
+      if (result.scores.length === 0 && result.message) {
+        console.info("[test-result] analyze:staying-on-step", { at: new Date().toISOString(), kind, reason: result.message });
+        return;
+      }
+      console.info("[test-result] analyze:advance", { at: new Date().toISOString(), kind });
       onDone(result);
     } finally {
-      setBusy(false);
+      if (isMounted.current && requestId.current === activeRequestId) {
+        setBusy(false);
+        console.info("[test-result] analyze:busy-false", { at: new Date().toISOString(), kind });
+      }
     }
-  }
-
-  function useDemo() {
-    if (busy) return;
-    onDone(mockTestAnalysis(kind));
   }
 
   function skip() {
@@ -71,7 +86,7 @@ export function TestResultView({
 
       <Notice>
         Selles prototüübis saadetakse üles laaditud või kleebitud testi tulemus AI analüüsiks lokaalse serveri kaudu OpenAI API-sse. Ära laadi siia
-        tundlikke isikuandmeid. Demo seis salvestub ainult sinu brauseri localStorage'isse.
+        tundlikke isikuandmeid. Seis salvestub ainult sinu brauseri localStorage'isse.
       </Notice>
       {message && <Notice tone="warn">{message}</Notice>}
 
@@ -108,9 +123,6 @@ export function TestResultView({
       <div className="buttonRow">
         <button className="primary" disabled={busy} onClick={analyze}>
           {busy ? "Analüüsin..." : analyzeLabel}
-        </button>
-        <button className="secondary" disabled={busy} onClick={useDemo}>
-          {demoLabel}
         </button>
         <button className="ghost" disabled={busy} onClick={skip}>
           {skipLabel}

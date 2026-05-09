@@ -1,10 +1,41 @@
-import type { FreeTextAnalysis, ProfileSummary, TestAnalysis } from "../types";
+import type {
+  CatalogAmet,
+  CatalogCourse,
+  CatalogCurriculum,
+  FreeTextAnalysis,
+  ProfileSummary,
+  RecommendationResponse,
+  ScoreItem,
+  TestAnalysis,
+} from "../types";
 import { mockFreeTextAnalysis, mockProfileSummary, mockTestAnalysis } from "./mockAnalyzer";
 
 const apiBasePath = (import.meta.env.VITE_API_BASE_PATH || "").replace(/\/+$/, "");
 
 function apiUrl(path: string) {
   return `${apiBasePath}${path}`;
+}
+
+function logApi(stage: string, details: Record<string, unknown>) {
+  console.info(`[api] ${stage}`, { at: new Date().toISOString(), ...details });
+}
+
+async function fetchWithTimeout(input: RequestInfo | URL, init: RequestInit = {}, ms = 35000) {
+  const controller = new AbortController();
+  const started = performance.now();
+  const url = String(input);
+  const timer = window.setTimeout(() => controller.abort(), ms);
+  logApi("request:start", { url, method: init.method ?? "GET", timeoutMs: ms });
+  try {
+    const response = await fetch(input, { ...init, signal: controller.signal });
+    logApi("request:done", { url, status: response.status, durationMs: Math.round(performance.now() - started) });
+    return response;
+  } catch (error) {
+    logApi("request:error", { url, durationMs: Math.round(performance.now() - started), message: error instanceof Error ? error.message : String(error) });
+    throw error;
+  } finally {
+    window.clearTimeout(timer);
+  }
 }
 
 async function readJson<T>(response: Response): Promise<T> {
@@ -14,39 +45,95 @@ async function readJson<T>(response: Response): Promise<T> {
 
 export async function analyzeTest(kind: "interests" | "skills", text: string, file: File | null): Promise<TestAnalysis> {
   try {
+    logApi("analyze-test:start", { kind, textLength: text.length, hasFile: Boolean(file), fileName: file?.name, fileType: file?.type });
     const formData = new FormData();
     formData.set("text", text);
     if (file) formData.set("file", file);
-    return await readJson<TestAnalysis>(await fetch(apiUrl(`/api/analyze/${kind}`), { method: "POST", body: formData }));
-  } catch {
-    return mockTestAnalysis(kind, "AI analüüs ei olnud hetkel saadaval. Kasutame demoanalüüsi, et saaksid prototüüpi edasi vaadata.");
+    const result = await readJson<TestAnalysis>(await fetchWithTimeout(apiUrl(`/api/analyze/${kind}`), { method: "POST", body: formData }));
+    logApi("analyze-test:done", { kind, scoreCount: result.scores.length, source: result.source, message: result.message });
+    return result;
+  } catch (error) {
+    logApi("analyze-test:fallback", { kind, message: error instanceof Error ? error.message : String(error) });
+    return mockTestAnalysis(kind, "AI analüüs ei olnud hetkel saadaval. Näidisandmeid ei kasutata; palun proovi uuesti või kleebi testi protsendid tekstina.");
   }
 }
 
 export async function analyzeFreeText(text: string): Promise<FreeTextAnalysis> {
   try {
     return await readJson<FreeTextAnalysis>(
-      await fetch(apiUrl("/api/analyze/free-text"), {
+      await fetchWithTimeout(apiUrl("/api/analyze/free-text"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
       }),
     );
   } catch {
-    return mockFreeTextAnalysis(text, "AI analüüs ei olnud hetkel saadaval. Kasutame demoanalüüsi, et saaksid prototüüpi edasi vaadata.");
+    return mockFreeTextAnalysis(text, "AI analüüs ei olnud hetkel saadaval. Näidisandmeid ei kasutata; jätkame ainult sinu sisestatud tekstiga.");
   }
+}
+
+export type RecommendationInput = {
+  interestScores: Pick<ScoreItem, "key" | "score">[];
+  skillScores: Pick<ScoreItem, "key" | "score">[];
+  freeText: string;
+  freeTextGoals: string[];
+  freeTextConcerns: string[];
+  tags: string[];
+  selectedDomains: string[];
+  aiSummary: string;
+};
+
+export async function getRecommendations(payload: RecommendationInput): Promise<RecommendationResponse> {
+  const response = await fetchWithTimeout(apiUrl("/api/recommend"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  return readJson<RecommendationResponse>(response);
+}
+
+export type CatalogQuery = {
+  interestScores: Pick<ScoreItem, "key" | "score">[];
+  skillScores: Pick<ScoreItem, "key" | "score">[];
+  freeText: string;
+  freeTextGoals: string[];
+  freeTextConcerns: string[];
+  tags: string[];
+  selectedDomains: string[];
+};
+
+async function postCatalog<T>(path: string, payload: CatalogQuery): Promise<T[]> {
+  const response = await fetchWithTimeout(apiUrl(path), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const json = await readJson<{ items: T[] }>(response);
+  return Array.isArray(json.items) ? json.items : [];
+}
+
+export function getCatalogCurricula(payload: CatalogQuery) {
+  return postCatalog<CatalogCurriculum>("/api/catalog/curricula", payload);
+}
+
+export function getCatalogCourses(payload: CatalogQuery) {
+  return postCatalog<CatalogCourse>("/api/catalog/courses", payload);
+}
+
+export function getCatalogJobs(payload: CatalogQuery) {
+  return postCatalog<CatalogAmet>("/api/catalog/jobs", payload);
 }
 
 export async function analyzeProfileSummary(payload: unknown): Promise<ProfileSummary> {
   try {
     return await readJson<ProfileSummary>(
-      await fetch(apiUrl("/api/analyze/profile-summary"), {
+      await fetchWithTimeout(apiUrl("/api/analyze/profile-summary"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       }),
     );
   } catch {
-    return mockProfileSummary("AI analüüs ei olnud hetkel saadaval. Kasutame demoanalüüsi, et saaksid prototüüpi edasi vaadata.");
+    return mockProfileSummary(payload, "AI analüüs ei olnud hetkel saadaval. Näidisandmeid ei kasutata; jätkame ainult sinu sisestatud profiiliandmetega.");
   }
 }

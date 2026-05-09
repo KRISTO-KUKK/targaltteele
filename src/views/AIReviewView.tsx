@@ -8,6 +8,19 @@ function splitIntoPhrases(paragraph: string) {
   return paragraph.match(/[^,.!?;:]+[,.!?;:]?\s*/g) ?? [paragraph];
 }
 
+const inFlightProfileSummaries = new Map<string, Promise<ProfileSummary>>();
+
+function getProfileSummary(payload: unknown) {
+  const key = JSON.stringify(payload);
+  const existing = inFlightProfileSummaries.get(key);
+  if (existing) return existing;
+  const request = analyzeProfileSummary(payload).finally(() => {
+    inFlightProfileSummaries.delete(key);
+  });
+  inFlightProfileSummaries.set(key, request);
+  return request;
+}
+
 export function AIReviewView({
   user,
   onConfirm,
@@ -39,7 +52,7 @@ export function AIReviewView({
       setLoading(true);
       setShowQuestion(false);
       const started = Date.now();
-      const result = await analyzeProfileSummary({
+      const result = await getProfileSummary({
         profile: user,
         mode: "first_reflection",
         instruction: "Kirjuta keskmise pikkusega kasutajale suunatud arusaam sellest, millisena süsteem teda huvide, oskuste ja kirjelduste põhjal mõistis. Tõsta olulisemad märksõnad **boldina** esile.",
@@ -70,7 +83,7 @@ export function AIReviewView({
     if (!trimmedCorrection) return;
     setSubmittingCorrection(true);
     setShowQuestion(false);
-    const result = await analyzeProfileSummary({
+    const result = await getProfileSummary({
       profile: user,
       previousSummary: summary?.summary,
       userCorrection: trimmedCorrection,

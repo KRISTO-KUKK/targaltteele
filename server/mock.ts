@@ -1,58 +1,79 @@
 import { interestDimensions, skillDimensions } from "./taxonomy";
 
-const demoInterestScores = [
-  { ...interestDimensions[0], score: 86 },
-  { ...interestDimensions[1], score: 78 },
-  { ...interestDimensions[3], score: 72 },
-  { ...interestDimensions[4], score: 64 },
-  { ...interestDimensions[2], score: 48 },
-  { ...interestDimensions[5], score: 32 },
-];
-
-const demoSkillScores = [
-  { ...skillDimensions[0], score: 84 },
-  { ...skillDimensions[1], score: 76 },
-  { ...skillDimensions[2], score: 68 },
-  { ...skillDimensions[4], score: 62 },
-  { ...skillDimensions[3], score: 55 },
-  { ...skillDimensions[5], score: 42 },
-];
-
 export function mockTest(kind: "interests" | "skills", message?: string) {
-  const scores = kind === "interests" ? demoInterestScores : demoSkillScores;
   return {
-    scores,
-    tags: Array.from(new Set(scores.flatMap((score) => score.tags))),
-    summary:
-      kind === "interests"
-        ? "Demoanalüüsi põhjal paistavad esile sotsiaalne, uuriv ja loominguline huvisuund."
-        : "Demoanalüüsi põhjal on tugevamad oskused suhtlemine, koostöö ja info mõtestamine.",
+    scores: [],
+    tags: [],
+    summary: kind === "interests" ? "Huvide testi tulemust ei saanud automaatselt tõlgendada." : "Oskuste testi tulemust ei saanud automaatselt tõlgendada.",
     source: "mock",
     message,
   };
 }
 
 export function mockFreeText(text = "", message?: string) {
-  const hasText = Boolean(text.trim());
+  const trimmed = text.trim();
   return {
-    tags: hasText ? ["huvi täpsustamine", "praktiline katsetamine"] : [],
-    goals: hasText ? ["võrrelda mitut võimalikku suunda"] : [],
-    concerns: hasText ? ["vajab lisainfot rollide igapäevatöö kohta"] : [],
-    interestScores: hasText ? demoInterestScores.slice(0, 4).map((item) => ({ ...item, score: Math.max(45, item.score - 10) })) : [],
-    skillScores: hasText ? demoSkillScores.slice(0, 4).map((item) => ({ ...item, score: Math.max(45, item.score - 8) })) : [],
-    summary: hasText ? "Kasutaja soovib suunda täpsustada ja valikuid praktiliselt võrrelda." : "Vaba teksti sammu ei täidetud.",
+    tags: extractKeywords(trimmed),
+    goals: [],
+    concerns: [],
+    interestScores: [],
+    skillScores: [],
+    summary: trimmed
+      ? `Vaba tekst salvestati. AI kokkuvõtet ei loodud, seega jätkame ainult sinu sisestatud tekstiga: "${trimmed.slice(0, 220)}${trimmed.length > 220 ? "..." : ""}"`
+      : "Vaba teksti sammu ei täidetud.",
     source: "mock",
     message,
   };
 }
 
-export function mockProfile(message?: string) {
+export function mockProfile(payload?: unknown, message?: string) {
+  const profile = readProfile(payload);
+  const interestText = formatTopScores(profile?.interestScores, interestDimensions);
+  const skillText = formatTopScores(profile?.skillScores, skillDimensions);
+  const selectedDomains = Array.isArray(profile?.selectedDomains) ? profile.selectedDomains.filter(Boolean).join(", ") : "";
+  const freeText = typeof profile?.freeText === "string" ? profile.freeText.trim() : "";
+  const tags = [
+    ...(Array.isArray(profile?.freeTextTags) ? profile.freeTextTags : []),
+    ...(Array.isArray(profile?.interestTags) ? profile.interestTags : []),
+    ...(Array.isArray(profile?.skillTags) ? profile.skillTags : []),
+  ].filter(Boolean);
+
   return {
-    summary:
-      "Minu praegune arusaam sinust on, et sind võivad kõnetada suunad, kus saab korraga **mõelda**, inimestega suhelda ja midagi päriselt ära teha. Sinu profiilis paistab olevat vajadus tähenduse järele: ainult teooria või ainult rutiinne töö ei pruugi olla kõige tugevam sobivus.\n\nHuvide poolelt tulevad esile **sotsiaalne huvi** ja **uuriv huvi**. Oskuste poolelt toetavad seda **suhtlemine**, **koostöö** ja **info mõtestamine**, mis võib sobida valdkondadesse, kus on vaja kuulata, küsida ja teha praktilisi järeldusi.\n\nSamas ei ole see lõplik hinnang. Seda tasub võtta kui esimest hüpoteesi, mida sina saad kohe parandada: võib-olla peaks rohkem arvestama **tehnoloogia**, looduse, loomade, bioloogia või mõne muu konkreetse huviga.",
-    possibleJobDirections: ["noorsootöötaja", "personalispetsialist", "kommunikatsioonispetsialist", "sotsiaaltöötaja", "karjäärinõustaja"],
-    possibleEducationDirections: ["noorsootöö", "sotsiaaltöö", "kommunikatsioon", "haridusteadused", "personalijuhtimine"],
+    summary: [
+      "AI peegeldust ei saanud praegu luua, seega näidisandmeid ei kasutata. See kokkuvõte põhineb ainult sinu sisestatud profiiliandmetel.",
+      interestText ? `Huvide testi põhjal on praegu tugevamad suunad: **${interestText}**.` : "Huvide testi skoore ei ole profiilis.",
+      skillText ? `Oskuste testi põhjal on praegu tugevamad tugevused: **${skillText}**.` : "Oskuste testi skoore ei ole profiilis.",
+      selectedDomains ? `Valitud valdkonnad: **${selectedDomains}**.` : "",
+      freeText ? `Sinu enda tekstist jäi alles järgmine sisend: "${freeText.slice(0, 260)}${freeText.length > 260 ? "..." : ""}"` : "",
+      tags.length ? `Märksõnad profiilis: **${Array.from(new Set(tags)).slice(0, 10).join(", ")}**.` : "",
+    ]
+      .filter(Boolean)
+      .join("\n\n"),
+    possibleJobDirections: [],
+    possibleEducationDirections: [],
     source: "mock",
     message,
   };
+}
+
+function readProfile(payload: unknown): any {
+  if (!payload || typeof payload !== "object") return null;
+  const record = payload as { profile?: unknown };
+  return record.profile && typeof record.profile === "object" ? record.profile : null;
+}
+
+function formatTopScores(scores: unknown, dimensions: Array<{ key: string; label: string }>) {
+  if (!Array.isArray(scores)) return "";
+  const labelByKey = new Map(dimensions.map((dimension) => [dimension.key, dimension.label]));
+  return scores
+    .filter((score): score is { key: string; label?: string; score: number } => Boolean(score) && typeof score === "object" && typeof (score as any).score === "number")
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 6)
+    .map((score) => `${score.label || labelByKey.get(score.key) || score.key} ${score.score}%`)
+    .join(", ");
+}
+
+function extractKeywords(text: string) {
+  const lowered = text.toLowerCase();
+  return ["bioloogia", "loomad", "ai", "it", "tervis", "muusika", "ettevõtlus", "loovus", "tehnoloogia", "inimesed", "loodus"].filter((keyword) => lowered.includes(keyword));
 }

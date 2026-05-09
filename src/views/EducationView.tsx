@@ -1,59 +1,80 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Notice } from "../components/Notice";
 import { PlanButtons } from "../components/PlanButtons";
-import { catalogEducationOptions, educationDomains, educationLevels } from "../data/educationCatalog";
-import { rankByProfile, scoreEducationForState } from "../utils/scoring";
-import type { AppState, EducationOption, PlanId } from "../types";
+import { getCatalogCurricula } from "../utils/api";
+import { buildCatalogQuery } from "../utils/catalogQuery";
+import type { AppState, CatalogCurriculum, PlanEducation, PlanId } from "../types";
 
 export function EducationView({
   state,
   setEducationForPlan,
 }: {
   state: AppState;
-  setEducationForPlan: (planId: PlanId, educationId: string) => void;
+  setEducationForPlan: (planId: PlanId, education: PlanEducation) => void;
 }) {
   const [query, setQuery] = useState("");
   const [level, setLevel] = useState("Kõik");
-  const [domain, setDomain] = useState("Kõik");
-  const ranked = useMemo(() => {
-    return rankByProfile(
-      catalogEducationOptions.map((education) => ({ education, score: scoreEducationForState(education, state) })),
-      (item) => item.score,
-    );
-  }, [state]);
-  const visible = ranked.filter(({ education, score }) => {
-    const haystack = `${education.title} ${education.school} ${education.description} ${education.tags.join(" ")}`.toLocaleLowerCase("et-EE");
-    const hasQuery = Boolean(query.trim());
-    const matchesQuery = haystack.includes(query.toLocaleLowerCase("et-EE"));
-    const matchesLevel = level === "Kõik" || education.level === level;
-    const matchesDomain = domain === "Kõik" || education.domain === domain;
-    const matchesProfile = hasQuery || score > 0 || !state.user?.selectedDomains.length;
-    return matchesQuery && matchesLevel && matchesDomain && matchesProfile;
-  });
+  const [items, setItems] = useState<CatalogCurriculum[]>([]);
+  const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setStatus("loading");
+    setError(null);
+    getCatalogCurricula(buildCatalogQuery(state))
+      .then((response) => {
+        if (cancelled) return;
+        setItems(response);
+        setStatus("ready");
+      })
+      .catch((cause: Error) => {
+        if (cancelled) return;
+        setError(cause.message);
+        setStatus("error");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [state.user]);
+
+  const levels = useMemo(() => {
+    const set = new Set<string>();
+    for (const curriculum of items) if (curriculum.oppeaste) set.add(curriculum.oppeaste);
+    return ["Kõik", ...Array.from(set).sort((a, b) => a.localeCompare(b, "et-EE"))];
+  }, [items]);
+
+  const visible = useMemo(() => {
+    const lowerQuery = query.toLocaleLowerCase("et-EE");
+    return items.filter((curriculum) => {
+      const haystack = `${curriculum.pealkiri} ${curriculum.sisu} ${curriculum.oppeaste}`.toLocaleLowerCase("et-EE");
+      if (lowerQuery && !haystack.includes(lowerQuery)) return false;
+      if (level !== "Kõik" && curriculum.oppeaste !== level) return false;
+      return true;
+    });
+  }, [items, query, level]);
 
   return (
     <section className="stack">
       <div className="sectionTitle">
         <p className="eyebrow">V08</p>
         <h1>Edasiõppimisvõimalused</h1>
-        <p>Need õpiteed tulevad nüüd repo erialade andmefailist. AI ja skooriloogika aitavad neid sinu sisendi järgi järjestada, aga lõplikke valikuid see ei tee.</p>
+        <p>Päris õppekavad EHIS-e andmestikust on järjestatud sinu 12-punktise huvi- ja oskuseprofiili järgi (kaalutud Eukleidiline kaugus). Vabateksti märksõnad annavad lisapunkte.</p>
       </div>
       <div className="filters">
         <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Otsing" />
         <select value={level} onChange={(event) => setLevel(event.target.value)}>
-          {educationLevels.map((item) => (
-            <option key={item}>{item}</option>
-          ))}
-        </select>
-        <select value={domain} onChange={(event) => setDomain(event.target.value)}>
-          {educationDomains.map((item) => (
+          {levels.map((item) => (
             <option key={item}>{item}</option>
           ))}
         </select>
       </div>
-      <p className="muted">Näitan {visible.length} profiiliga seotud õppekava kokku {catalogEducationOptions.length} seast. Otsinguga saad kataloogist laiemalt otsida.</p>
+      {status === "loading" && <Notice>Laeme õppekavasid...</Notice>}
+      {status === "error" && <Notice tone="warn">Õppekavade laadimine ebaõnnestus: {error}</Notice>}
+      {status === "ready" && <p className="muted">Näitan {visible.length} õppekava kokku {items.length} seast.</p>}
       <div className="grid two">
-        {visible.map(({ education, score }) => (
-          <EducationCard education={education} matchScore={score} setEducationForPlan={setEducationForPlan} key={education.id} />
+        {visible.map((curriculum) => (
+          <EducationCard curriculum={curriculum} setEducationForPlan={setEducationForPlan} key={curriculum.kood} />
         ))}
       </div>
     </section>
@@ -61,36 +82,39 @@ export function EducationView({
 }
 
 function EducationCard({
-  education,
-  matchScore,
+  curriculum,
   setEducationForPlan,
 }: {
-  education: EducationOption;
-  matchScore: number;
-  setEducationForPlan: (planId: PlanId, educationId: string) => void;
+  curriculum: CatalogCurriculum;
+  setEducationForPlan: (planId: PlanId, education: PlanEducation) => void;
 }) {
+  const snapshot: PlanEducation = {
+    kood: curriculum.kood,
+    pealkiri: curriculum.pealkiri,
+    oppeaste: curriculum.oppeaste,
+    url: curriculum.url,
+  };
   return (
     <article className="card">
-      <p className="eyebrow">
-        {education.school} · {education.level}
+      <p className="eyebrow">{curriculum.oppeaste || "Õppekava"} · sobivus {curriculum.matchScore}</p>
+      <h2>{curriculum.pealkiri}</h2>
+      <p className="metaLine">
+        <span>Kood {curriculum.kood}</span>
       </p>
-      <h2>{education.title}</h2>
-      <div className="metaLine">
-        <span>Sobivusskoor {Math.round(matchScore)}</span>
-        {education.credits ? <span>{education.credits} EAP</span> : null}
-        {education.durationYears ? <span>{education.durationYears} aastat</span> : null}
-        {education.domain ? <span>{education.domain}</span> : null}
-      </div>
-      <p>{education.description}</p>
-      <p>
-        <strong>Miks seda näen?</strong> {education.why}
-      </p>
-      {education.relatedSkills.length > 0 && (
+      {curriculum.sisu && (
         <p>
-          <strong>Seotud oskused:</strong> {education.relatedSkills.join(", ")}
+          {curriculum.sisu.slice(0, 320)}
+          {curriculum.sisu.length > 320 ? "…" : ""}
         </p>
       )}
-      <PlanButtons onAdd={(planId) => setEducationForPlan(planId, education.id)} />
+      {curriculum.url && (
+        <p>
+          <a href={curriculum.url} target="_blank" rel="noreferrer">
+            Vaata õppekava →
+          </a>
+        </p>
+      )}
+      <PlanButtons onAdd={(planId) => setEducationForPlan(planId, snapshot)} />
     </article>
   );
 }

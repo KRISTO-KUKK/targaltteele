@@ -9,7 +9,6 @@ export function SkillsTestView({ onDone }: { onDone: (analysis: TestAnalysis) =>
       linkLabel="Ava oskuste test"
       linkUrl="https://minukarjaar.ee/et/testid/milline-on-sinu-oskuste-profiil"
       analyzeLabel="Analüüsi oskuste tulemus"
-      demoLabel="Kasuta demo oskuste tulemust"
       skipLabel="Jäta oskuste test praegu vahele"
       kind="skills"
       onDone={onDone}

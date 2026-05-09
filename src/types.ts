@@ -75,13 +75,33 @@ export type Job = {
 
 export type PlanId = "A" | "B" | "C";
 
+export type PlanEducation = {
+  kood: string;
+  pealkiri: string;
+  oppeaste: string;
+  url: string | null;
+};
+
+export type PlanJob = {
+  id: string;
+  nimi: string;
+  kirjeldus: string;
+};
+
+export type PlanCourse = {
+  link: string;
+  pealkiri: string;
+  sisu: string;
+  tags: string[];
+};
+
 export type Plan = {
   id: PlanId;
   title: string;
   note: string;
-  educationId: string | null;
-  jobIds: string[];
-  courseIds: string[];
+  education: PlanEducation | null;
+  jobs: PlanJob[];
+  courses: PlanCourse[];
 };
 
 export type AppView =
@@ -95,7 +115,8 @@ export type AppView =
   | "courses"
   | "education"
   | "jobs"
-  | "plans";
+  | "plans"
+  | "recommendations";
 
 export type ActivePlanFilter = "all" | "profile" | PlanId;
 
@@ -133,4 +154,76 @@ export type ProfileSummary = {
   possibleEducationDirections: string[];
   source: "ai" | "mock";
   message?: string;
+};
+
+export type CurriculumMatch = {
+  kood: string;
+  pealkiri: string;
+  oppeaste: string;
+  sisu: string;
+  url: string | null;
+  matchScore: number;
+};
+
+export type AmetSample = {
+  id: string;
+  nimi: string;
+  kirjeldus: string;
+};
+
+export type FieldMatch = {
+  id: string;
+  nimi: string;
+  kirjeldus: string;
+  tags: string[];
+  matchScore: number;
+  sampleAmetid: AmetSample[];
+};
+
+export type CourseSuggestion = {
+  link: string;
+  pealkiri: string;
+  sisu: string;
+  tags: string[];
+};
+
+export type RecommendationResponse = {
+  topCurricula: CurriculumMatch[];
+  topFields: FieldMatch[];
+  refinedCurricula: CurriculumMatch[];
+  suggestedCourses: CourseSuggestion[];
+  explanation: string;
+  source: "ai" | "math-only";
+  message?: string;
+};
+
+export type CatalogCurriculum = {
+  kood: string;
+  pealkiri: string;
+  oppeaste: string;
+  sisu: string;
+  url: string | null;
+  matchScore: number;
+};
+
+export type CatalogCourse = {
+  link: string;
+  pealkiri: string;
+  sisu: string;
+  tags: string[];
+  matchScore: number;
+};
+
+export type CatalogAmetField = {
+  id: string;
+  nimi: string;
+  matchScore: number;
+};
+
+export type CatalogAmet = {
+  id: string;
+  nimi: string;
+  kirjeldus: string;
+  fields: CatalogAmetField[];
+  matchScore: number;
 };

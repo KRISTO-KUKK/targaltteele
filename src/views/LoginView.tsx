@@ -1,4 +1,4 @@
-import { demoUser } from "../data/demoData";
+import { blankUser } from "../data/appData";
 
 export function LoginView({ start }: { start: () => void }) {
   return (
@@ -28,10 +28,10 @@ export function LoginView({ start }: { start: () => void }) {
             </div>
           </article>
           <article className="mapCard">
-            <p className="eyebrow">demo kasutaja</p>
-            <h2>{demoUser.name}</h2>
+            <p className="eyebrow">profiil</p>
+            <h2>{blankUser.name}</h2>
             <p className="muted">
-              {demoUser.grade} · {demoUser.school}
+              {blankUser.grade} · {blankUser.school}
             </p>
           </article>
         </div>

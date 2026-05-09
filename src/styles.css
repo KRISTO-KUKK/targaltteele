@@ -767,3 +767,10 @@ button.active,
     max-width: none;
   }
 }
+
+.ametList { display: flex; flex-direction: column; gap: 6px; margin: 8px 0 12px; }
+.ametItem { background: var(--paper-soft); border: 1px solid var(--limestone); border-radius: 10px; padding: 8px 12px; }
+.ametItem summary { cursor: pointer; font-weight: 600; outline: none; padding: 4px 0; user-select: none; }
+.ametItem summary:hover { color: var(--moss); }
+.ametItem[open] summary { color: var(--moss); margin-bottom: 6px; }
+.ametItem p { margin: 6px 0 4px; font-size: 0.93em; color: var(--charcoal); line-height: 1.5; }

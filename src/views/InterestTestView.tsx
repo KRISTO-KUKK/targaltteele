@@ -9,7 +9,6 @@ export function InterestTestView({ onDone }: { onDone: (analysis: TestAnalysis) 
       linkLabel="Ava huvide test"
       linkUrl="https://minukarjaar.ee/et/testid/milline-on-sinu-huvide-profiil"
       analyzeLabel="Analüüsi huvide tulemus"
-      demoLabel="Kasuta demo huvide tulemust"
       skipLabel="Jäta huvide test praegu vahele"
       kind="interests"
       onDone={onDone}

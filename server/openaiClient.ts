@@ -16,5 +16,9 @@ export function getModel() {
 
 export function createOpenAIClient() {
   if (!process.env.OPENAI_API_KEY) return null;
-  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+    maxRetries: 0,
+    timeout: 20000,
+  });
 }

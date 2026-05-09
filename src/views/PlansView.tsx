@@ -1,5 +1,3 @@
-import { courses, jobs } from "../data/demoData";
-import { catalogEducationOptions } from "../data/educationCatalog";
 import type { AppState, Plan, PlanId } from "../types";
 import { Notice } from "../components/Notice";
 import type { ReactNode } from "react";
@@ -23,7 +21,7 @@ export function PlansView({
   updatePlan: (planId: PlanId, patch: Partial<Plan>) => void;
   removeEducation: (planId: PlanId) => void;
   removeJob: (planId: PlanId, jobId: string) => void;
-  removeCourse: (planId: PlanId, courseId: string) => void;
+  removeCourse: (planId: PlanId, courseLink: string) => void;
   showPlanCourses: (planId: PlanId) => void;
   showPlanJobs: (planId: PlanId) => void;
 }) {
@@ -66,14 +64,11 @@ function PlanCard({
   updatePlan: (planId: PlanId, patch: Partial<Plan>) => void;
   removeEducation: (planId: PlanId) => void;
   removeJob: (planId: PlanId, jobId: string) => void;
-  removeCourse: (planId: PlanId, courseId: string) => void;
+  removeCourse: (planId: PlanId, courseLink: string) => void;
   showPlanCourses: (planId: PlanId) => void;
   showPlanJobs: (planId: PlanId) => void;
 }) {
-  const education = catalogEducationOptions.find((item) => item.id === plan.educationId);
-  const selectedJobs = jobs.filter((job) => plan.jobIds.includes(job.id));
-  const selectedCourses = courses.filter((course) => plan.courseIds.includes(course.id));
-  const empty = !education && !selectedJobs.length && !selectedCourses.length;
+  const empty = !plan.education && plan.jobs.length === 0 && plan.courses.length === 0;
 
   return (
     <article className="card planCard">
@@ -84,27 +79,30 @@ function PlanCard({
         <textarea value={plan.note} onChange={(event) => updatePlan(plan.id, { note: event.target.value })} />
       </label>
       {empty && <p className="empty">Selles plaanis pole veel valikuid. Lisa edasiõppimisvõimalus, amet või kursus.</p>}
-      {education && (
+      {plan.education && (
         <PlanBlock title="Valitud edasiõppimisvõimalus">
-          <SelectedItem title={`${education.title} · ${education.school}`} remove={() => removeEducation(plan.id)} />
+          <SelectedItem
+            title={`${plan.education.pealkiri}${plan.education.oppeaste ? ` · ${plan.education.oppeaste}` : ""}`}
+            remove={() => removeEducation(plan.id)}
+          />
         </PlanBlock>
       )}
-      {selectedJobs.length > 0 && (
+      {plan.jobs.length > 0 && (
         <PlanBlock title="Valitud ametid">
-          {selectedJobs.map((job) => (
-            <SelectedItem title={job.title} remove={() => removeJob(plan.id, job.id)} key={job.id} />
+          {plan.jobs.map((job) => (
+            <SelectedItem title={job.nimi} remove={() => removeJob(plan.id, job.id)} key={job.id} />
           ))}
         </PlanBlock>
       )}
-      {selectedCourses.length > 0 && (
+      {plan.courses.length > 0 && (
         <PlanBlock title="Valitud kursused">
-          {selectedCourses.map((course) => (
-            <SelectedItem title={course.title} remove={() => removeCourse(plan.id, course.id)} key={course.id} />
+          {plan.courses.map((course) => (
+            <SelectedItem title={course.pealkiri} remove={() => removeCourse(plan.id, course.link)} key={course.link} />
           ))}
         </PlanBlock>
       )}
       <PlanBlock title="AI / süsteemi kokkuvõte">
-        <p>{buildSummary(education?.title, selectedJobs.map((job) => job.title), selectedCourses.map((course) => course.title))}</p>
+        <p>{buildSummary(plan.education?.pealkiri, plan.jobs.map((job) => job.nimi), plan.courses.map((course) => course.pealkiri))}</p>
       </PlanBlock>
       <PlanBlock title="Riskid">
         <ul>

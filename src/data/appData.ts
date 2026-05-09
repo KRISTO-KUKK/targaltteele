@@ -1,13 +1,13 @@
 import { interestScore, skillScore } from "./taxonomy";
 import type { AppState, Course, EducationOption, Job, Plan, PlanId, ScoreItem, UserProfile } from "../types";
 
-export const storageKey = "targalt-teele-demo-state";
+export const storageKey = "targalt-teele-state";
 
-export const demoUser: UserProfile = {
-  id: "demo-laura",
-  name: "Laura",
-  grade: "10. klass",
-  school: "Demo Gümnaasium",
+export const blankUser: UserProfile = {
+  id: "current-user",
+  name: "Kasutaja",
+  grade: "Õpilane",
+  school: "Targalt teele",
   interestScores: [],
   skillScores: [],
   interestTags: [],
@@ -22,23 +22,21 @@ export const demoUser: UserProfile = {
   possibleEducationDirections: [],
 };
 
-export const demoInterestScores: ScoreItem[] = [
-  interestScore("sotsiaalne", 86),
-  interestScore("uuriv", 78),
-  interestScore("loominguline", 72),
-  interestScore("susteemne", 64),
-  interestScore("ettevotlik", 48),
-  interestScore("praktiline", 32),
-].filter((item): item is ScoreItem => Boolean(item));
-
-export const demoSkillScores: ScoreItem[] = [
-  skillScore("suhtlemine_koostoo", 84),
-  skillScore("loovus_uldistamine", 76),
-  skillScore("analuus_info", 68),
-  skillScore("kohanemine_toimetulek", 62),
-  skillScore("ettevotlikkus_organiseerimine", 55),
-  skillScore("juhtimine_eestvedamine", 42),
-].filter((item): item is ScoreItem => Boolean(item));
+export function createBlankUser(): UserProfile {
+  return {
+    ...blankUser,
+    interestScores: [...blankUser.interestScores],
+    skillScores: [...blankUser.skillScores],
+    interestTags: [...blankUser.interestTags],
+    skillTags: [...blankUser.skillTags],
+    freeTextTags: [...blankUser.freeTextTags],
+    freeTextGoals: [...blankUser.freeTextGoals],
+    freeTextConcerns: [...blankUser.freeTextConcerns],
+    selectedDomains: [...blankUser.selectedDomains],
+    possibleJobDirections: [...blankUser.possibleJobDirections],
+    possibleEducationDirections: [...blankUser.possibleEducationDirections],
+  };
+}
 
 export const domains = [
   "IT ja digitehnoloogia",
@@ -348,9 +346,9 @@ export const jobs: Job[] = [
 
 export function createPlans(): Record<PlanId, Plan> {
   return {
-    A: { id: "A", title: "Plaan A", note: "Esimene eelistus või suund, mida tahaksid kõige rohkem uurida.", educationId: null, jobIds: [], courseIds: [] },
-    B: { id: "B", title: "Plaan B", note: "Realistlik alternatiiv, kui esimene valik vajab muutmist.", educationId: null, jobIds: [], courseIds: [] },
-    C: { id: "C", title: "Plaan C", note: "Varuplaan või katsetamise suund.", educationId: null, jobIds: [], courseIds: [] },
+    A: { id: "A", title: "Plaan A", note: "Esimene eelistus või suund, mida tahaksid kõige rohkem uurida.", education: null, jobs: [], courses: [] },
+    B: { id: "B", title: "Plaan B", note: "Realistlik alternatiiv, kui esimene valik vajab muutmist.", education: null, jobs: [], courses: [] },
+    C: { id: "C", title: "Plaan C", note: "Varuplaan või katsetamise suund.", education: null, jobs: [], courses: [] },
   };
 }
 
@@ -363,5 +361,3 @@ export function createInitialState(): AppState {
   };
 }
 
-export const mockSummary =
-  "Sinu sisestatud andmete põhjal paistab, et sind võivad huvitada inimesed, ühiskondlikud teemad ja eneseväljendus. Soovitused on mõeldud uurimiseks ja võrdlemiseks, mitte lõplikuks hinnanguks.";

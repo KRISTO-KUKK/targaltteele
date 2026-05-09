@@ -20,7 +20,7 @@ export async function extractTextFromUpload(kind: "interests" | "skills", file?:
   } else if (file.mimetype === "application/pdf") {
     throw new Error("PDF text extraction is not available in the bundled server build");
   } else if (file.mimetype.startsWith("image/")) {
-    text = await extractTextFromImage(file.mimetype, file.buffer.toString("base64"));
+    text = await withTimeout(extractTextFromImage(file.mimetype, file.buffer.toString("base64")));
     method = "image-ocr";
   }
 
@@ -59,4 +59,16 @@ async function saveExtractedText(kind: string, originalName: string, text: strin
   const filePath = path.join(directory, fileName);
   await fs.writeFile(filePath, text, "utf8");
   return path.relative(process.cwd(), filePath);
+}
+
+async function withTimeout<T>(task: Promise<T>, ms = 25000): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error("OCR request timed out")), ms);
+  });
+  try {
+    return await Promise.race([task, timeout]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }

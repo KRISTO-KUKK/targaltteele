@@ -4,6 +4,7 @@ import teeleLogo from "../assets/teele-logo.svg";
 
 const navItems: { view: AppView; label: string }[] = [
   { view: "profile", label: "Profiil" },
+  { view: "recommendations", label: "Soovitused" },
   { view: "courses", label: "Kursused" },
   { view: "education", label: "Edasiõppimine" },
   { view: "jobs", label: "Ametid" },
@@ -43,7 +44,7 @@ export function Layout({
               {state.user.name} · {state.user.grade}
             </span>
             <button className="ghost danger" onClick={reset}>
-              Lähtesta demo
+              Lähtesta profiil
             </button>
           </div>
         )}

@@ -1,42 +1,78 @@
-import { demoInterestScores, demoSkillScores, mockSummary } from "../data/demoData";
 import type { FreeTextAnalysis, ProfileSummary, TestAnalysis } from "../types";
 
 export function mockTestAnalysis(kind: "interests" | "skills", message?: string): TestAnalysis {
-  const scores = kind === "interests" ? demoInterestScores : demoSkillScores;
   return {
-    scores,
-    tags: Array.from(new Set(scores.flatMap((score) => score.tags))),
-    summary:
-      kind === "interests"
-        ? "Demoanalüüsi põhjal paistavad esile inimestega töötamine, kogukond ja kommunikatsioon. Neid suundi tasub edasi uurida rahulikult ja võrdlevalt."
-        : "Demoanalüüsi põhjal on tugevamad üldoskused suhtlemine, koostöö ja kirjalik eneseväljendus. Digioskusi saab soovi korral praktiliste kursustega juurde arendada.",
+    scores: [],
+    tags: [],
+    summary: kind === "interests" ? "Huvide testi tulemust ei saanud automaatselt tõlgendada." : "Oskuste testi tulemust ei saanud automaatselt tõlgendada.",
     source: "mock",
     message,
   };
 }
 
 export function mockFreeTextAnalysis(text: string, message?: string): FreeTextAnalysis {
-  const hasText = Boolean(text.trim());
+  const trimmed = text.trim();
   return {
-    tags: hasText ? ["huvi täpsustamine", "paindlikkus", "praktiline katsetamine"] : [],
-    goals: hasText ? ["leida suund, mida saab enne lõplikku valikut katsetada"] : [],
-    concerns: hasText ? ["vajab lisainfot, milline roll päriselt sobib"] : [],
-    interestScores: hasText ? demoInterestScores.slice(0, 4).map((item) => ({ ...item, score: Math.max(45, item.score - 10) })) : [],
-    skillScores: hasText ? demoSkillScores.slice(0, 4).map((item) => ({ ...item, score: Math.max(45, item.score - 8) })) : [],
-    summary: hasText
-      ? "Sinu kirjeldus viitab soovile võrrelda mitut võimalikku suunda ja teha valik praktilise katsetamise kaudu."
-      : "Vaba teksti sammu jätsid praegu vahele. Soovitused põhinevad testitulemustel ja valitud valdkondadel.",
+    tags: extractKeywords(trimmed),
+    goals: [],
+    concerns: [],
+    interestScores: [],
+    skillScores: [],
+    summary: trimmed
+      ? `Vaba tekst salvestati. AI kokkuvõtet ei loodud, seega jätkame ainult sinu sisestatud tekstiga: "${trimmed.slice(0, 220)}${trimmed.length > 220 ? "..." : ""}"`
+      : "Vaba teksti sammu ei täidetud.",
     source: "mock",
     message,
   };
 }
 
-export function mockProfileSummary(message?: string): ProfileSummary {
+export function mockProfileSummary(payload?: unknown, message?: string): ProfileSummary {
+  const profile = readProfile(payload);
+  const interestText = formatTopScores(profile?.interestScores);
+  const skillText = formatTopScores(profile?.skillScores);
+  const selectedDomains = Array.isArray(profile?.selectedDomains) ? profile.selectedDomains.filter(Boolean).join(", ") : "";
+  const freeText = typeof profile?.freeText === "string" ? profile.freeText.trim() : "";
+  const tags = [
+    ...(Array.isArray(profile?.freeTextTags) ? profile.freeTextTags : []),
+    ...(Array.isArray(profile?.interestTags) ? profile.interestTags : []),
+    ...(Array.isArray(profile?.skillTags) ? profile.skillTags : []),
+  ].filter(Boolean);
+
   return {
-    summary: `Minu praegune arusaam sinust on, et sulle võib sobida suund, kus saab **inimestega suhelda**, infot mõtestada ja päriselulist mõju luua. Sa ei otsi ilmselt ainult ühte ametinimetust, vaid kohta, kus huvid, õppimisviis ja tugevused omavahel kokku sobivad.\n\nHuvide poolelt paistab välja **sotsiaalne huvi** ja **uuriv huvi**: küsimuste esitamine, inimeste mõistmine ja soov aru saada, mis päriselt sobib. Oskuste poolelt toetavad seda **suhtlemine**, **koostöö** ja **info mõtestamine**.\n\nSee ei ole lõplik otsus, vaid kontrollitav hüpotees. Kui mõni oluline asi jäi puudu, näiteks **IT**, **bioloogia**, loomad, loovus või praktiline tehniline töö, saad seda enne soovituste avamist parandada.`,
-    possibleJobDirections: ["noorsootöötaja", "personalispetsialist", "kommunikatsioonispetsialist", "sotsiaaltöötaja", "karjäärinõustaja"],
-    possibleEducationDirections: ["noorsootöö", "sotsiaaltöö", "kommunikatsioon", "haridusteadused", "personalijuhtimine"],
+    summary: [
+      "AI peegeldust ei saanud praegu luua, seega näidisandmeid ei kasutata. See kokkuvõte põhineb ainult sinu sisestatud profiiliandmetel.",
+      interestText ? `Huvide testi põhjal on praegu tugevamad suunad: **${interestText}**.` : "Huvide testi skoore ei ole profiilis.",
+      skillText ? `Oskuste testi põhjal on praegu tugevamad tugevused: **${skillText}**.` : "Oskuste testi skoore ei ole profiilis.",
+      selectedDomains ? `Valitud valdkonnad: **${selectedDomains}**.` : "",
+      freeText ? `Sinu enda tekstist jäi alles järgmine sisend: "${freeText.slice(0, 260)}${freeText.length > 260 ? "..." : ""}"` : "",
+      tags.length ? `Märksõnad profiilis: **${Array.from(new Set(tags)).slice(0, 10).join(", ")}**.` : "",
+    ]
+      .filter(Boolean)
+      .join("\n\n"),
+    possibleJobDirections: [],
+    possibleEducationDirections: [],
     source: "mock",
     message,
   };
+}
+
+function readProfile(payload: unknown): any {
+  if (!payload || typeof payload !== "object") return null;
+  const record = payload as { profile?: unknown };
+  return record.profile && typeof record.profile === "object" ? record.profile : null;
+}
+
+function formatTopScores(scores: unknown) {
+  if (!Array.isArray(scores)) return "";
+  return scores
+    .filter((score): score is { label?: string; key: string; score: number } => Boolean(score) && typeof score === "object" && typeof (score as any).score === "number")
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 6)
+    .map((score) => `${score.label || score.key} ${score.score}%`)
+    .join(", ");
+}
+
+function extractKeywords(text: string) {
+  const lowered = text.toLowerCase();
+  return ["bioloogia", "loomad", "ai", "it", "tervis", "muusika", "ettevõtlus", "loovus", "tehnoloogia", "inimesed", "loodus"].filter((keyword) => lowered.includes(keyword));
 }

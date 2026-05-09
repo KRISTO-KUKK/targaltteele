@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Notice } from "../components/Notice";
-import { domains } from "../data/demoData";
+import { domains } from "../data/appData";
 
 export function DomainSelectionView({ selected, onDone }: { selected: string[]; onDone: (domains: string[]) => void }) {
   const [localSelected, setLocalSelected] = useState(selected);

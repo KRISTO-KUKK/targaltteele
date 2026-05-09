@@ -65,7 +65,10 @@ export function ProfileView({ state, setView }: { state: AppState; setView: (vie
       </div>
 
       <div className="buttonRow">
-        <button className="primary" onClick={() => setView("courses")}>
+        <button className="primary" onClick={() => setView("recommendations")}>
+          Vaata isiklikke soovitusi
+        </button>
+        <button className="secondary" onClick={() => setView("courses")}>
           Vaata kursuseid
         </button>
         <button className="secondary" onClick={() => setView("education")}>

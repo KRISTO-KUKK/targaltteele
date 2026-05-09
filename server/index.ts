@@ -6,6 +6,8 @@ import path from "node:path";
 import { analyzeFreeText, analyzeProfileSummary, analyzeTest } from "./analyze";
 import { extractTextFromUpload } from "./extractText";
 import { mockTest } from "./mock";
+import { getRecommendations, type RecommendInput } from "./recommend";
+import { rankAmetid, rankCourses, rankCurricula, type CatalogInput } from "./catalog";
 
 const runtimeDirectory = typeof __dirname === "string" ? __dirname : process.cwd();
 
@@ -35,6 +37,22 @@ app.use(express.json({ limit: "1mb" }));
 
 const apiRouter = express.Router();
 
+apiRouter.use((req, res, next) => {
+  const started = Date.now();
+  console.log(`[api] ${req.method} ${req.originalUrl} start`, {
+    at: new Date().toISOString(),
+    contentType: req.headers["content-type"],
+  });
+  res.on("finish", () => {
+    console.log(`[api] ${req.method} ${req.originalUrl} done`, {
+      at: new Date().toISOString(),
+      status: res.statusCode,
+      durationMs: Date.now() - started,
+    });
+  });
+  next();
+});
+
 apiRouter.get("/health", (_req, res) => {
   res.json({ ok: true });
 });
@@ -55,6 +73,46 @@ apiRouter.post("/analyze/profile-summary", async (req, res) => {
   res.json(await analyzeProfileSummary(req.body));
 });
 
+function readCatalogInput(body: any): CatalogInput {
+  const safe = (body ?? {}) as Partial<CatalogInput>;
+  return {
+    interestScores: Array.isArray(safe.interestScores) ? safe.interestScores : [],
+    skillScores: Array.isArray(safe.skillScores) ? safe.skillScores : [],
+    freeText: typeof safe.freeText === "string" ? safe.freeText : "",
+    freeTextGoals: Array.isArray(safe.freeTextGoals) ? safe.freeTextGoals.map(String) : [],
+    freeTextConcerns: Array.isArray(safe.freeTextConcerns) ? safe.freeTextConcerns.map(String) : [],
+    tags: Array.isArray(safe.tags) ? safe.tags.map(String) : [],
+    selectedDomains: Array.isArray(safe.selectedDomains) ? safe.selectedDomains.map(String) : [],
+  };
+}
+
+apiRouter.post("/catalog/curricula", (req, res) => {
+  res.json({ items: rankCurricula(readCatalogInput(req.body)) });
+});
+
+apiRouter.post("/catalog/courses", (req, res) => {
+  res.json({ items: rankCourses(readCatalogInput(req.body)) });
+});
+
+apiRouter.post("/catalog/jobs", (req, res) => {
+  res.json({ items: rankAmetid(readCatalogInput(req.body)) });
+});
+
+apiRouter.post("/recommend", async (req, res) => {
+  const body = (req.body ?? {}) as Partial<RecommendInput>;
+  const input: RecommendInput = {
+    interestScores: Array.isArray(body.interestScores) ? body.interestScores : [],
+    skillScores: Array.isArray(body.skillScores) ? body.skillScores : [],
+    freeText: typeof body.freeText === "string" ? body.freeText : "",
+    freeTextGoals: Array.isArray(body.freeTextGoals) ? body.freeTextGoals.map(String) : [],
+    freeTextConcerns: Array.isArray(body.freeTextConcerns) ? body.freeTextConcerns.map(String) : [],
+    tags: Array.isArray(body.tags) ? body.tags.map(String) : [],
+    selectedDomains: Array.isArray(body.selectedDomains) ? body.selectedDomains.map(String) : [],
+    aiSummary: typeof body.aiSummary === "string" ? body.aiSummary : "",
+  };
+  res.json(await getRecommendations(input));
+});
+
 app.use("/api", apiRouter);
 if (appBasePath) {
   app.use(`${appBasePath}/api`, apiRouter);
@@ -65,7 +123,7 @@ app.use((error: unknown, _req: express.Request, res: express.Response, _next: ex
     res.status(413).json({ message: "Fail on liiga suur. Palun laadi väiksem fail või kleebi tulemuse tekst." });
     return;
   }
-  res.status(400).json({ message: "Faili ei saanud töödelda. Palun kleebi tulemuse tekst või kasuta demoandmeid." });
+  res.status(400).json({ message: "Faili ei saanud töödelda. Palun kleebi tulemuse tekst käsitsi." });
 });
 
 if (isProduction) {
@@ -91,6 +149,12 @@ function normalizeBasePath(value: string) {
 }
 
 async function analyzeUploadedTest(kind: "interests" | "skills", text = "", file?: Express.Multer.File) {
+  console.log("[api] analyze-uploaded-test:start", {
+    at: new Date().toISOString(),
+    kind,
+    textLength: text.length,
+    file: file ? { originalname: file.originalname, mimetype: file.mimetype, size: file.size } : null,
+  });
   try {
     const extracted = await extractTextFromUpload(kind, file);
     const combinedText = [text, extracted.text].filter(Boolean).join("\n\n");
@@ -103,7 +167,12 @@ async function analyzeUploadedTest(kind: "interests" | "skills", text = "", file
       extractedTextFile: extracted.savedPath,
       extractedTextMethod: extracted.method,
     };
-  } catch {
+  } catch (error) {
+    console.log("[api] analyze-uploaded-test:error", {
+      at: new Date().toISOString(),
+      kind,
+      message: error instanceof Error ? error.message : String(error),
+    });
     if (file?.mimetype.startsWith("image/")) {
       return mockTest(kind, "Pildi OCR ei õnnestunud. Proovi selgemat pilti või kleebi tulemuse tekst käsitsi.");
     }

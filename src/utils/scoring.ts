@@ -1,5 +1,3 @@
-import { courses, jobs } from "../data/demoData";
-import { catalogEducationOptions } from "../data/educationCatalog";
 import type { AppState, Course, EducationOption, Job, Plan, ScoreItem } from "../types";
 
 function normalize(value: string) {
@@ -28,16 +26,13 @@ export function profileTags(state: AppState): string[] {
 }
 
 export function planTags(plan: Plan): string[] {
-  const education = catalogEducationOptions.find((item) => item.id === plan.educationId);
-  const selectedJobs = jobs.filter((item) => plan.jobIds.includes(item.id));
-  const selectedCourses = courses.filter((item) => plan.courseIds.includes(item.id));
   return Array.from(
     new Set([
-      ...(education?.tags ?? []),
-      ...(education?.relatedSkills ?? []),
-      ...selectedJobs.flatMap((item) => [...item.tags, ...item.skills, ...item.domains]),
-      ...selectedCourses.flatMap((item) => [...item.tags, ...item.develops, ...item.domains]),
-    ]),
+      plan.education?.pealkiri ?? "",
+      plan.education?.oppeaste ?? "",
+      ...plan.jobs.map((job) => job.nimi),
+      ...plan.courses.flatMap((course) => [course.pealkiri, ...course.tags]),
+    ].filter(Boolean)),
   );
 }
 
