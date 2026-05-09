@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Notice } from "../components/Notice";
 import { PlanButtons } from "../components/PlanButtons";
-import { getCatalogJobs } from "../utils/api";
+import { getCatalogJobs, peekCatalogJobs } from "../utils/api";
 import { buildCatalogQuery } from "../utils/catalogQuery";
 import { filterTagsFor } from "../utils/scoring";
 import type { ActivePlanFilter, AppState, CatalogAmet, PlanId, PlanJob } from "../types";
@@ -23,16 +23,24 @@ export function JobsView({
   setFilter: (filter: ActivePlanFilter) => void;
   addJobToPlan: (planId: PlanId, job: PlanJob) => void;
 }) {
+  const payload = useMemo(() => buildCatalogQuery(state), [state.user]);
+  const cached = peekCatalogJobs(payload);
   const [query, setQuery] = useState("");
-  const [items, setItems] = useState<CatalogAmet[]>([]);
-  const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [items, setItems] = useState<CatalogAmet[]>(cached ?? []);
+  const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">(cached ? "ready" : "loading");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    setStatus("loading");
+    const hot = peekCatalogJobs(payload);
+    if (hot) {
+      setItems(hot);
+      setStatus("ready");
+    } else {
+      setStatus("loading");
+    }
     setError(null);
-    getCatalogJobs(buildCatalogQuery(state))
+    getCatalogJobs(payload)
       .then((response) => {
         if (cancelled) return;
         setItems(response);
@@ -46,7 +54,7 @@ export function JobsView({
     return () => {
       cancelled = true;
     };
-  }, [state.user]);
+  }, [payload]);
 
   const activeTags = useMemo(() => filterTagsFor(state, state.activePlanFilter).map((tag) => tag.toLocaleLowerCase("et-EE")), [state]);
 

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Notice } from "../components/Notice";
 import { PlanButtons } from "../components/PlanButtons";
-import { getCatalogCurricula } from "../utils/api";
+import { getCatalogCurricula, peekCatalogCurricula } from "../utils/api";
 import { buildCatalogQuery } from "../utils/catalogQuery";
 import type { AppState, CatalogCurriculum, PlanEducation, PlanId } from "../types";
 
@@ -12,17 +12,25 @@ export function EducationView({
   state: AppState;
   setEducationForPlan: (planId: PlanId, education: PlanEducation) => void;
 }) {
+  const payload = useMemo(() => buildCatalogQuery(state), [state.user]);
+  const cached = peekCatalogCurricula(payload);
   const [query, setQuery] = useState("");
   const [level, setLevel] = useState("Kõik");
-  const [items, setItems] = useState<CatalogCurriculum[]>([]);
-  const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [items, setItems] = useState<CatalogCurriculum[]>(cached ?? []);
+  const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">(cached ? "ready" : "loading");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    setStatus("loading");
+    const hot = peekCatalogCurricula(payload);
+    if (hot) {
+      setItems(hot);
+      setStatus("ready");
+    } else {
+      setStatus("loading");
+    }
     setError(null);
-    getCatalogCurricula(buildCatalogQuery(state))
+    getCatalogCurricula(payload)
       .then((response) => {
         if (cancelled) return;
         setItems(response);
@@ -36,7 +44,7 @@ export function EducationView({
     return () => {
       cancelled = true;
     };
-  }, [state.user]);
+  }, [payload]);
 
   const levels = useMemo(() => {
     const set = new Set<string>();

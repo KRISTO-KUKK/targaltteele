@@ -39,7 +39,7 @@ async function askJson(system: string, user: UserContent) {
   return parseJson(response.choices[0]?.message?.content ?? "{}");
 }
 
-async function withTimeout<T>(task: Promise<T>, ms = 25000): Promise<T> {
+async function withTimeout<T>(task: Promise<T>, ms = 60000): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<never>((_, reject) => {
     timer = setTimeout(() => reject(new Error("AI request timed out")), ms);

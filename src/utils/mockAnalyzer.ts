@@ -28,27 +28,16 @@ export function mockFreeTextAnalysis(text: string, message?: string): FreeTextAn
 
 export function mockProfileSummary(payload?: unknown, message?: string): ProfileSummary {
   const profile = readProfile(payload);
-  const interestText = formatTopScores(profile?.interestScores);
-  const skillText = formatTopScores(profile?.skillScores);
   const selectedDomains = Array.isArray(profile?.selectedDomains) ? profile.selectedDomains.filter(Boolean).join(", ") : "";
   const freeText = typeof profile?.freeText === "string" ? profile.freeText.trim() : "";
-  const tags = [
-    ...(Array.isArray(profile?.freeTextTags) ? profile.freeTextTags : []),
-    ...(Array.isArray(profile?.interestTags) ? profile.interestTags : []),
-    ...(Array.isArray(profile?.skillTags) ? profile.skillTags : []),
-  ].filter(Boolean);
+
+  const parts: string[] = ["AI peegeldust ei saanud praegu luua."];
+  if (selectedDomains) parts.push(`Valisid valdkonnad **${selectedDomains}**.`);
+  if (freeText) parts.push(`Sinu enda sõnadest: "${freeText.slice(0, 200)}${freeText.length > 200 ? "…" : ""}"`);
+  parts.push("Kasutan neid soovituste alusena; testitulemused jäävad ainult taustaks.");
 
   return {
-    summary: [
-      "AI peegeldust ei saanud praegu luua, seega näidisandmeid ei kasutata. See kokkuvõte põhineb ainult sinu sisestatud profiiliandmetel.",
-      interestText ? `Huvide testi põhjal on praegu tugevamad suunad: **${interestText}**.` : "Huvide testi skoore ei ole profiilis.",
-      skillText ? `Oskuste testi põhjal on praegu tugevamad tugevused: **${skillText}**.` : "Oskuste testi skoore ei ole profiilis.",
-      selectedDomains ? `Valitud valdkonnad: **${selectedDomains}**.` : "",
-      freeText ? `Sinu enda tekstist jäi alles järgmine sisend: "${freeText.slice(0, 260)}${freeText.length > 260 ? "..." : ""}"` : "",
-      tags.length ? `Märksõnad profiilis: **${Array.from(new Set(tags)).slice(0, 10).join(", ")}**.` : "",
-    ]
-      .filter(Boolean)
-      .join("\n\n"),
+    summary: parts.join(" "),
     possibleJobDirections: [],
     possibleEducationDirections: [],
     source: "mock",
@@ -60,16 +49,6 @@ function readProfile(payload: unknown): any {
   if (!payload || typeof payload !== "object") return null;
   const record = payload as { profile?: unknown };
   return record.profile && typeof record.profile === "object" ? record.profile : null;
-}
-
-function formatTopScores(scores: unknown) {
-  if (!Array.isArray(scores)) return "";
-  return scores
-    .filter((score): score is { label?: string; key: string; score: number } => Boolean(score) && typeof score === "object" && typeof (score as any).score === "number")
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 6)
-    .map((score) => `${score.label || score.key} ${score.score}%`)
-    .join(", ");
 }
 
 function extractKeywords(text: string) {

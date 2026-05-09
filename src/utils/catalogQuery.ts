@@ -12,6 +12,7 @@ export function buildCatalogQuery(state: AppState): CatalogQuery {
       freeTextConcerns: [],
       tags: [],
       selectedDomains: [],
+      aiSummary: "",
     };
   }
   return {
@@ -22,5 +23,6 @@ export function buildCatalogQuery(state: AppState): CatalogQuery {
     freeTextConcerns: user.freeTextConcerns,
     tags: Array.from(new Set([...user.interestTags, ...user.skillTags, ...user.freeTextTags])),
     selectedDomains: user.selectedDomains,
+    aiSummary: user.aiSummary,
   };
 }

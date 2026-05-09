@@ -1,36 +1,48 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Notice } from "../components/Notice";
-import { getRecommendations } from "../utils/api";
+import { getRecommendations, peekRecommendations, type RecommendationInput } from "../utils/api";
 import type { AppState, AppView, CurriculumMatch, FieldMatch, RecommendationResponse } from "../types";
 
 type Status = "idle" | "loading" | "ready" | "error";
 
 export function RecommendationsView({ state, setView }: { state: AppState; setView: (view: AppView) => void }) {
-  const [data, setData] = useState<RecommendationResponse | null>(null);
-  const [status, setStatus] = useState<Status>("idle");
+  const payload = useMemo<RecommendationInput | null>(() => {
+    const user = state.user;
+    if (!user) return null;
+    return {
+      interestScores: user.interestScores.map(({ key, score }) => ({ key, score })),
+      skillScores: user.skillScores.map(({ key, score }) => ({ key, score })),
+      freeText: user.freeText,
+      freeTextGoals: user.freeTextGoals,
+      freeTextConcerns: user.freeTextConcerns,
+      tags: Array.from(
+        new Set([
+          ...user.interestTags,
+          ...user.skillTags,
+          ...user.freeTextTags,
+        ]),
+      ),
+      selectedDomains: user.selectedDomains,
+      aiSummary: user.aiSummary,
+    };
+  }, [state.user]);
+  const cached = payload ? peekRecommendations(payload) : undefined;
+  const [data, setData] = useState<RecommendationResponse | null>(cached ?? null);
+  const [status, setStatus] = useState<Status>(cached ? "ready" : "loading");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!state.user) return;
+    if (!payload) return;
     let cancelled = false;
-    setStatus("loading");
+    const hot = peekRecommendations(payload);
+    if (hot) {
+      setData(hot);
+      setStatus("ready");
+    } else {
+      setStatus("loading");
+    }
     setError(null);
-    getRecommendations({
-      interestScores: state.user.interestScores.map(({ key, score }) => ({ key, score })),
-      skillScores: state.user.skillScores.map(({ key, score }) => ({ key, score })),
-      freeText: state.user.freeText,
-      freeTextGoals: state.user.freeTextGoals,
-      freeTextConcerns: state.user.freeTextConcerns,
-      tags: Array.from(
-        new Set([
-          ...state.user.interestTags,
-          ...state.user.skillTags,
-          ...state.user.freeTextTags,
-        ]),
-      ),
-      selectedDomains: state.user.selectedDomains,
-      aiSummary: state.user.aiSummary,
-    })
+    getRecommendations(payload)
       .then((response) => {
         if (cancelled) return;
         setData(response);
@@ -44,7 +56,7 @@ export function RecommendationsView({ state, setView }: { state: AppState; setVi
     return () => {
       cancelled = true;
     };
-  }, [state.user]);
+  }, [payload]);
 
   if (!state.user) return null;
 
@@ -88,7 +100,6 @@ export function RecommendationsView({ state, setView }: { state: AppState; setVi
                       <strong>{course.pealkiri}</strong>
                     </a>
                     {course.reason && <p className="recommendReason">{course.reason}</p>}
-                    <p>{course.sisu.slice(0, 220)}{course.sisu.length > 220 ? "…" : ""}</p>
                     {course.tags.length > 0 && (
                       <div className="chipRow">
                         {course.tags.slice(0, 6).map((tag) => (

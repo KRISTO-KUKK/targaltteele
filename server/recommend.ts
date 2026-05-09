@@ -265,7 +265,7 @@ async function callRefiner(payload: ReturnType<typeof buildLlmPayload>) {
   return safeJsonParse(response.choices[0]?.message?.content ?? "");
 }
 
-async function withTimeout<T>(task: Promise<T>, ms = 25000): Promise<T> {
+async function withTimeout<T>(task: Promise<T>, ms = 60000): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<never>((_, reject) => {
     timer = setTimeout(() => reject(new Error("AI request timed out")), ms);
@@ -428,10 +428,8 @@ export async function getRecommendations(input: RecommendInput): Promise<Recomme
       topFields,
       refinedCurricula: topCurricula.slice(0, 5).map((candidate) => ({ ...candidate, reason: fallbackCurriculumReason(candidate) })),
       suggestedCourses: fallbackCourses(input, candidateCourses),
-      explanation:
-        "AI lõplik ülevaatus polnud saadaval. Näitame signaalipõhist shortlisti: esmalt õpilase tekst, valitud valdkonnad ja märksõnad; testitulemused on ainult pehme taustakontroll.",
+      explanation: "Näitame signaalipõhist shortlisti sinu teksti, valdkondade ja märksõnade põhjal.",
       source: "math-only",
-      message: "AI peenhäälestus võttis liiga kaua, seega näitame kohe signaalipõhist soovituste nimekirja.",
     };
   }
 }

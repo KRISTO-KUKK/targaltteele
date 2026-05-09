@@ -8,6 +8,7 @@ import { extractTextFromUpload } from "./extractText";
 import { mockTest } from "./mock";
 import { getRecommendations, type RecommendInput } from "./recommend";
 import { rankAmetid, rankCourses, rankCurricula, type CatalogInput } from "./catalog";
+import { getOpenAITimeoutMs, probeOpenAI } from "./openaiClient";
 
 const runtimeDirectory = typeof __dirname === "string" ? __dirname : process.cwd();
 
@@ -83,6 +84,7 @@ function readCatalogInput(body: any): CatalogInput {
     freeTextConcerns: Array.isArray(safe.freeTextConcerns) ? safe.freeTextConcerns.map(String) : [],
     tags: Array.isArray(safe.tags) ? safe.tags.map(String) : [],
     selectedDomains: Array.isArray(safe.selectedDomains) ? safe.selectedDomains.map(String) : [],
+    aiSummary: typeof safe.aiSummary === "string" ? safe.aiSummary : "",
   };
 }
 
@@ -140,6 +142,14 @@ if (isProduction) {
 
 app.listen(port, () => {
   console.log(`Targalt teele API server listening on http://127.0.0.1:${port}`);
+  console.log(`[openai] timeout=${getOpenAITimeoutMs()}ms, running startup probe...`);
+  probeOpenAI().then((result) => {
+    if (result.ok) {
+      console.log(`[openai] probe OK: model=${result.model} durationMs=${result.durationMs}`);
+    } else {
+      console.warn(`[openai] probe FAILED: model=${result.model} durationMs=${result.durationMs} message=${result.message ?? "(no message)"}`);
+    }
+  });
 });
 
 function normalizeBasePath(value: string) {

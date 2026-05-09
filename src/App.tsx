@@ -3,6 +3,8 @@ import { Layout } from "./components/Layout";
 import { Notice } from "./components/Notice";
 import { createBlankUser, createInitialState } from "./data/appData";
 import { clearState, loadState, saveState } from "./utils/storage";
+import { clearCatalogCache, clearRecommendationCache, prefetchCatalog, prefetchRecommendations } from "./utils/api";
+import { buildCatalogQuery } from "./utils/catalogQuery";
 import type {
   ActivePlanFilter,
   AppState,
@@ -31,6 +33,15 @@ import { PlansView } from "./views/PlansView";
 import { AIReviewView } from "./views/AIReviewView";
 import { RecommendationsView } from "./views/RecommendationsView";
 
+const PREFETCHABLE_VIEWS = new Set<AppView>([
+  "profile",
+  "recommendations",
+  "education",
+  "courses",
+  "jobs",
+  "plans",
+]);
+
 function App() {
   const [state, setState] = useState<AppState>(() => loadState());
   const [toast, setToast] = useState("");
@@ -39,6 +50,28 @@ function App() {
   useEffect(() => {
     saveState(state);
   }, [state]);
+
+  const prefetchSignature = useRef<string>("");
+  useEffect(() => {
+    const user = state.user;
+    if (!user) return;
+    if (!PREFETCHABLE_VIEWS.has(state.currentView)) return;
+    const catalogPayload = buildCatalogQuery(state);
+    const signature = JSON.stringify(catalogPayload);
+    if (prefetchSignature.current === signature) return;
+    prefetchSignature.current = signature;
+    prefetchCatalog(catalogPayload);
+    prefetchRecommendations({
+      interestScores: catalogPayload.interestScores,
+      skillScores: catalogPayload.skillScores,
+      freeText: catalogPayload.freeText,
+      freeTextGoals: catalogPayload.freeTextGoals,
+      freeTextConcerns: catalogPayload.freeTextConcerns,
+      tags: catalogPayload.tags,
+      selectedDomains: catalogPayload.selectedDomains,
+      aiSummary: user.aiSummary,
+    });
+  }, [state.currentView, state.user]);
 
   function update(mutator: (current: AppState) => AppState) {
     setState((current) => mutator(current));
@@ -50,6 +83,9 @@ function App() {
 
   function reset() {
     activeRunId.current += 1;
+    prefetchSignature.current = "";
+    clearCatalogCache();
+    clearRecommendationCache();
     const freshState = createInitialState();
     setToast("");
     setState(freshState);
@@ -99,6 +135,9 @@ function App() {
 
   function startProfile() {
     activeRunId.current += 1;
+    prefetchSignature.current = "";
+    clearCatalogCache();
+    clearRecommendationCache();
     setToast("");
     setState({ ...createInitialState(), user: createBlankUser(), currentView: "domains" });
   }

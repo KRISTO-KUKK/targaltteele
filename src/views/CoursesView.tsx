@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Notice } from "../components/Notice";
 import { PlanButtons } from "../components/PlanButtons";
-import { getCatalogCourses } from "../utils/api";
+import { getCatalogCourses, peekCatalogCourses } from "../utils/api";
 import { buildCatalogQuery } from "../utils/catalogQuery";
 import { filterTagsFor } from "../utils/scoring";
 import type { ActivePlanFilter, AppState, CatalogCourse, PlanCourse, PlanId } from "../types";
@@ -23,16 +23,24 @@ export function CoursesView({
   setFilter: (filter: ActivePlanFilter) => void;
   addCourseToPlan: (planId: PlanId, course: PlanCourse) => void;
 }) {
+  const payload = useMemo(() => buildCatalogQuery(state), [state.user]);
+  const cached = peekCatalogCourses(payload);
   const [query, setQuery] = useState("");
-  const [items, setItems] = useState<CatalogCourse[]>([]);
-  const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [items, setItems] = useState<CatalogCourse[]>(cached ?? []);
+  const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">(cached ? "ready" : "loading");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    setStatus("loading");
+    const hot = peekCatalogCourses(payload);
+    if (hot) {
+      setItems(hot);
+      setStatus("ready");
+    } else {
+      setStatus("loading");
+    }
     setError(null);
-    getCatalogCourses(buildCatalogQuery(state))
+    getCatalogCourses(payload)
       .then((response) => {
         if (cancelled) return;
         setItems(response);
@@ -46,7 +54,7 @@ export function CoursesView({
     return () => {
       cancelled = true;
     };
-  }, [state.user]);
+  }, [payload]);
 
   const activeTags = useMemo(() => filterTagsFor(state, state.activePlanFilter).map((tag) => tag.toLocaleLowerCase("et-EE")), [state]);
   const planIsEmpty = ["A", "B", "C"].includes(state.activePlanFilter) && activeTags.length === 0;
@@ -121,12 +129,6 @@ function CourseCard({ course, addCourseToPlan }: { course: CatalogCourse; addCou
     <article className="card">
       <p className="eyebrow">Lisakursus · sobivus {course.matchScore}</p>
       <h2>{course.pealkiri}</h2>
-      {course.sisu && (
-        <p>
-          {course.sisu.slice(0, 280)}
-          {course.sisu.length > 280 ? "…" : ""}
-        </p>
-      )}
       {course.tags.length > 0 && (
         <div className="chipRow">
           {course.tags.slice(0, 8).map((tag) => (
