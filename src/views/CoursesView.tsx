@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { PlanButtons } from "../components/PlanButtons";
 import { courses } from "../data/demoData";
-import { filterTagsFor, matchesFilter, profileTags, rankByProfile, scoreCourse, weakSkillLabels } from "../utils/scoring";
+import { filterTagsFor, matchesFilter, rankByProfile, scoreCourseForState, weakSkillLabels } from "../utils/scoring";
 import type { ActivePlanFilter, AppState, Course, PlanId } from "../types";
 
 const filters: { value: ActivePlanFilter; label: string }[] = [
@@ -26,8 +26,7 @@ export function CoursesView({
   const activeTags = filterTagsFor(state, state.activePlanFilter);
   const planIsEmpty = ["A", "B", "C"].includes(state.activePlanFilter) && activeTags.length === 0;
   const ranked = useMemo(() => {
-    const tags = profileTags(state);
-    return rankByProfile(courses, (course) => scoreCourse(course, tags, weakSkills));
+    return rankByProfile(courses, (course) => scoreCourseForState(course, state, weakSkills));
   }, [state, weakSkills.join("|")]);
   const visible = ranked.filter((course) => {
     const haystack = `${course.title} ${course.description} ${course.tags.join(" ")}`.toLocaleLowerCase("et-EE");
@@ -82,6 +81,9 @@ function CourseCard({ course, addCourseToPlan }: { course: Course; addCourseToPl
     <article className="card">
       <p className="eyebrow">{course.type}</p>
       <h2>{course.title}</h2>
+      <p className="metaLine">
+        <span>Maht: {course.workload}</span>
+      </p>
       <p>{course.description}</p>
       <p>
         <strong>Miks seda näen?</strong> {course.why}

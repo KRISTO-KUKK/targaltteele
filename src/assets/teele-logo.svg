@@ -1,0 +1,5 @@
+<svg width="126" height="40" viewBox="0 0 126 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0.5" y="0.5" width="39" height="39" rx="13.5" fill="#293D34" stroke="#DDE8DD"/>
+  <path d="M9 29.5L29.5 9" stroke="#F7F5EE" stroke-width="5" stroke-linecap="round"/>
+  <text x="51" y="27.5" fill="#121512" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="800" letter-spacing="0">Teele</text>
+</svg>

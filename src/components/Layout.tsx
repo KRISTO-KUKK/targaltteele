@@ -1,5 +1,6 @@
 import type { AppState, AppView } from "../types";
 import type { ReactNode } from "react";
+import teeleLogo from "../assets/teele-logo.svg";
 
 const navItems: { view: AppView; label: string }[] = [
   { view: "profile", label: "Profiil" },
@@ -20,12 +21,12 @@ export function Layout({
   reset: () => void;
   children: ReactNode;
 }) {
-  const showNav = Boolean(state.user && !["login", "interest-test", "skills-test", "free-text", "domains"].includes(state.currentView));
+  const showNav = Boolean(state.user && !["login", "interest-test", "skills-test", "free-text", "domains", "ai-review"].includes(state.currentView));
   return (
     <main className="appShell">
       <header className="topbar">
         <button className="brandButton" onClick={() => setView(state.user ? "profile" : "login")}>
-          Targalt teele
+          <img src={teeleLogo} alt="Teele" />
         </button>
         {showNav && (
           <nav aria-label="Peamine navigeerimine">

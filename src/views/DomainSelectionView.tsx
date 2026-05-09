@@ -22,7 +22,7 @@ export function DomainSelectionView({ selected, onDone }: { selected: string[]; 
   return (
     <section className="stack">
       <div className="sectionTitle">
-        <p className="eyebrow">4. samm</p>
+        <p className="eyebrow">1. samm</p>
         <h1>Vali kuni 5 valdkonda, mida soovid edasi uurida</h1>
         <p>Vali vähemalt üks valdkond. Saad hiljem plaane täpsustada kursuste, õpiteede ja ametitega.</p>
       </div>

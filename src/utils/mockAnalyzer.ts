@@ -16,11 +16,14 @@ export function mockTestAnalysis(kind: "interests" | "skills", message?: string)
 }
 
 export function mockFreeTextAnalysis(text: string, message?: string): FreeTextAnalysis {
+  const hasText = Boolean(text.trim());
   return {
-    tags: text.trim() ? ["huvi täpsustamine", "paindlikkus", "praktiline katsetamine"] : [],
-    goals: text.trim() ? ["leida suund, mida saab enne lõplikku valikut katsetada"] : [],
-    concerns: text.trim() ? ["vajab lisainfot, milline roll päriselt sobib"] : [],
-    summary: text.trim()
+    tags: hasText ? ["huvi täpsustamine", "paindlikkus", "praktiline katsetamine"] : [],
+    goals: hasText ? ["leida suund, mida saab enne lõplikku valikut katsetada"] : [],
+    concerns: hasText ? ["vajab lisainfot, milline roll päriselt sobib"] : [],
+    interestScores: hasText ? demoInterestScores.slice(0, 4).map((item) => ({ ...item, score: Math.max(45, item.score - 10) })) : [],
+    skillScores: hasText ? demoSkillScores.slice(0, 4).map((item) => ({ ...item, score: Math.max(45, item.score - 8) })) : [],
+    summary: hasText
       ? "Sinu kirjeldus viitab soovile võrrelda mitut võimalikku suunda ja teha valik praktilise katsetamise kaudu."
       : "Vaba teksti sammu jätsid praegu vahele. Soovitused põhinevad testitulemustel ja valitud valdkondadel.",
     source: "mock",
@@ -30,7 +33,7 @@ export function mockFreeTextAnalysis(text: string, message?: string): FreeTextAn
 
 export function mockProfileSummary(message?: string): ProfileSummary {
   return {
-    summary: mockSummary,
+    summary: `Minu praegune arusaam sinust on, et sulle võib sobida suund, kus saab **inimestega suhelda**, infot mõtestada ja päriselulist mõju luua. Sa ei otsi ilmselt ainult ühte ametinimetust, vaid kohta, kus huvid, õppimisviis ja tugevused omavahel kokku sobivad.\n\nHuvide poolelt paistab välja **sotsiaalne huvi** ja **uuriv huvi**: küsimuste esitamine, inimeste mõistmine ja soov aru saada, mis päriselt sobib. Oskuste poolelt toetavad seda **suhtlemine**, **koostöö** ja **info mõtestamine**.\n\nSee ei ole lõplik otsus, vaid kontrollitav hüpotees. Kui mõni oluline asi jäi puudu, näiteks **IT**, **bioloogia**, loomad, loovus või praktiline tehniline töö, saad seda enne soovituste avamist parandada.`,
     possibleJobDirections: ["noorsootöötaja", "personalispetsialist", "kommunikatsioonispetsialist", "sotsiaaltöötaja", "karjäärinõustaja"],
     possibleEducationDirections: ["noorsootöö", "sotsiaaltöö", "kommunikatsioon", "haridusteadused", "personalijuhtimine"],
     source: "mock",

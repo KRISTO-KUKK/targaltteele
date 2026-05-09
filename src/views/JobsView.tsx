@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { Notice } from "../components/Notice";
 import { PlanButtons } from "../components/PlanButtons";
-import { educationOptions, jobs } from "../data/demoData";
-import { filterTagsFor, matchesFilter, profileTags, rankByProfile, scoreJob } from "../utils/scoring";
+import { jobs } from "../data/demoData";
+import { filterTagsFor, matchesFilter, rankByProfile, scoreJobForState } from "../utils/scoring";
 import type { ActivePlanFilter, AppState, Job, PlanId } from "../types";
 
 const filters: { value: ActivePlanFilter; label: string }[] = [
@@ -25,8 +25,7 @@ export function JobsView({
   const [query, setQuery] = useState("");
   const activeTags = filterTagsFor(state, state.activePlanFilter);
   const ranked = useMemo(() => {
-    const tags = profileTags(state);
-    return rankByProfile(jobs, (job) => scoreJob(job, tags));
+    return rankByProfile(jobs, (job) => scoreJobForState(job, state));
   }, [state]);
   const visible = ranked.filter((job) => {
     const haystack = `${job.title} ${job.description} ${job.tags.join(" ")} ${job.skills.join(" ")}`.toLocaleLowerCase("et-EE");
@@ -72,11 +71,7 @@ function JobCard({ job, addJobToPlan }: { job: Job; addJobToPlan: (planId: PlanI
         <strong>Vajalik või tavapärane haridustee:</strong> {job.requiredEducation}
       </p>
       <p>
-        <strong>Seotud oskused:</strong> {job.skills.join(", ")}
-      </p>
-      <p>
-        <strong>Võimalikud edasiõppimise suunad:</strong>{" "}
-        {job.relatedEducationIds.map((id) => educationOptions.find((education) => education.id === id)?.title ?? id).join(", ")}
+        <strong>Palgavahemik:</strong> {job.salaryRange}
       </p>
       <div className="chipRow">
         {job.domains.map((domain) => (

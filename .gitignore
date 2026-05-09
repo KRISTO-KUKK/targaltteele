@@ -1,9 +1,11 @@
 node_modules/
 dist/
 .env
-.env.local
+.env.*
+!.env.example
+.npmrc
 .DS_Store
-vite.log
-vite.err.log
-dev-server.log
-dev-server.err.log
+*.log
+server-bundle.*
+server-light.*
+extracted-text/

@@ -28,23 +28,34 @@ export type Course = {
   id: string;
   title: string;
   type: "valikaine" | "lisakursus" | "veebikursus" | "praktiline tegevus";
+  workload: string;
   description: string;
   why: string;
   develops: string[];
   tags: string[];
   domains: string[];
+  interestScores?: ScoreItem[];
+  skillScores?: ScoreItem[];
 };
 
 export type EducationOption = {
   id: string;
+  code?: string;
   title: string;
   school: string;
-  level: "kutseõpe" | "rakenduskõrgharidus" | "bakalaureus" | "muu";
+  level: string;
+  credits?: number;
+  durationYears?: number;
+  domain?: string;
+  direction?: string;
+  url?: string;
   description: string;
   why: string;
   tags: string[];
   relatedJobIds: string[];
   relatedSkills: string[];
+  interestScores?: ScoreItem[];
+  skillScores?: ScoreItem[];
 };
 
 export type Job = {
@@ -53,10 +64,13 @@ export type Job = {
   description: string;
   why: string;
   requiredEducation: string;
+  salaryRange: string;
   skills: string[];
   tags: string[];
   domains: string[];
   relatedEducationIds: string[];
+  interestScores?: ScoreItem[];
+  skillScores?: ScoreItem[];
 };
 
 export type PlanId = "A" | "B" | "C";
@@ -76,6 +90,7 @@ export type AppView =
   | "skills-test"
   | "free-text"
   | "domains"
+  | "ai-review"
   | "profile"
   | "courses"
   | "education"
@@ -97,12 +112,16 @@ export type TestAnalysis = {
   summary: string;
   source: "ai" | "mock";
   message?: string;
+  extractedTextFile?: string | null;
+  extractedTextMethod?: string;
 };
 
 export type FreeTextAnalysis = {
   tags: string[];
   goals: string[];
   concerns: string[];
+  interestScores: ScoreItem[];
+  skillScores: ScoreItem[];
   summary: string;
   source: "ai" | "mock";
   message?: string;

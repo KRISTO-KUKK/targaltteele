@@ -1,4 +1,5 @@
-import { courses, educationOptions, jobs } from "../data/demoData";
+import { courses, jobs } from "../data/demoData";
+import { catalogEducationOptions } from "../data/educationCatalog";
 import type { AppState, Plan, PlanId } from "../types";
 import { Notice } from "../components/Notice";
 import type { ReactNode } from "react";
@@ -34,7 +35,7 @@ export function PlansView({
         <p>Plaanid täituvad jooksvalt sinu valitud kursustest, edasiõppimisvõimalustest ja ametitest.</p>
       </div>
       <Notice>Plaanid A, B ja C ei ole paremusjärjestus. Need aitavad sul näha erinevaid realistlikke teid.</Notice>
-      <div className="grid three">
+      <div className="planStack">
         {(["A", "B", "C"] as PlanId[]).map((planId) => (
           <PlanCard
             key={planId}
@@ -69,7 +70,7 @@ function PlanCard({
   showPlanCourses: (planId: PlanId) => void;
   showPlanJobs: (planId: PlanId) => void;
 }) {
-  const education = educationOptions.find((item) => item.id === plan.educationId);
+  const education = catalogEducationOptions.find((item) => item.id === plan.educationId);
   const selectedJobs = jobs.filter((job) => plan.jobIds.includes(job.id));
   const selectedCourses = courses.filter((course) => plan.courseIds.includes(course.id));
   const empty = !education && !selectedJobs.length && !selectedCourses.length;

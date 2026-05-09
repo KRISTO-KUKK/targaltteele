@@ -1,5 +1,6 @@
 import { BarChart } from "../components/BarChart";
 import { Notice } from "../components/Notice";
+import { RichText } from "../components/RichText";
 import type { AppState, AppView } from "../types";
 
 export function ProfileView({ state, setView }: { state: AppState; setView: (view: AppView) => void }) {
@@ -41,7 +42,7 @@ export function ProfileView({ state, setView }: { state: AppState; setView: (vie
 
       <div className="card">
         <h2>AI koostatud kokkuvõte</h2>
-        <p>{user.aiSummary || "Kokkuvõte tekib pärast valdkondade valikut."}</p>
+        {user.aiSummary ? <RichText text={user.aiSummary} className="profileSummaryText" /> : <p>Kokkuvõte tekib pärast valdkondade valikut.</p>}
       </div>
 
       <div className="grid two">

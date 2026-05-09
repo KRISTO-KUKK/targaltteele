@@ -1,19 +1,21 @@
+import { interestDimensions, skillDimensions } from "./taxonomy";
+
 const demoInterestScores = [
-  { key: "people", label: "Inimestega töötamine", score: 86, tags: ["inimesed", "nõustamine", "haridus"] },
-  { key: "society", label: "Ühiskond ja kogukond", score: 78, tags: ["ühiskond", "kogukond", "avalik sektor"] },
-  { key: "communication", label: "Kirjutamine ja kommunikatsioon", score: 72, tags: ["meedia", "kirjutamine", "kommunikatsioon"] },
-  { key: "creative", label: "Loov probleemilahendus", score: 64, tags: ["loovus", "probleemilahendus"] },
-  { key: "digital", label: "Digilahendused", score: 48, tags: ["IT", "digioskused"] },
-  { key: "practical", label: "Praktiline tehniline töö", score: 32, tags: ["tehnika", "praktiline"] },
+  { ...interestDimensions[0], score: 86 },
+  { ...interestDimensions[1], score: 78 },
+  { ...interestDimensions[3], score: 72 },
+  { ...interestDimensions[4], score: 64 },
+  { ...interestDimensions[2], score: 48 },
+  { ...interestDimensions[5], score: 32 },
 ];
 
 const demoSkillScores = [
-  { key: "communication", label: "Suhtlemine", score: 84, tags: ["suhtlemine", "nõustamine"] },
-  { key: "teamwork", label: "Koostöö", score: 80, tags: ["koostöö", "meeskond"] },
-  { key: "writing", label: "Kirjalik eneseväljendus", score: 76, tags: ["kirjutamine", "kommunikatsioon"] },
-  { key: "analysis", label: "Analüütiline mõtlemine", score: 68, tags: ["analüüs", "probleemilahendus"] },
-  { key: "selfManagement", label: "Enesejuhtimine", score: 62, tags: ["iseseisvus", "planeerimine"] },
-  { key: "digital", label: "Digioskused", score: 50, tags: ["IT", "digioskused"] },
+  { ...skillDimensions[0], score: 84 },
+  { ...skillDimensions[1], score: 76 },
+  { ...skillDimensions[2], score: 68 },
+  { ...skillDimensions[4], score: 62 },
+  { ...skillDimensions[3], score: 55 },
+  { ...skillDimensions[5], score: 42 },
 ];
 
 export function mockTest(kind: "interests" | "skills", message?: string) {
@@ -23,19 +25,22 @@ export function mockTest(kind: "interests" | "skills", message?: string) {
     tags: Array.from(new Set(scores.flatMap((score) => score.tags))),
     summary:
       kind === "interests"
-        ? "Demoanalüüsi põhjal paistavad esile inimestega töötamine, kogukond ja kommunikatsioon."
-        : "Demoanalüüsi põhjal on tugevamad üldoskused suhtlemine, koostöö ja kirjalik eneseväljendus.",
+        ? "Demoanalüüsi põhjal paistavad esile sotsiaalne, uuriv ja loominguline huvisuund."
+        : "Demoanalüüsi põhjal on tugevamad oskused suhtlemine, koostöö ja info mõtestamine.",
     source: "mock",
     message,
   };
 }
 
 export function mockFreeText(text = "", message?: string) {
+  const hasText = Boolean(text.trim());
   return {
-    tags: text.trim() ? ["huvi täpsustamine", "praktiline katsetamine"] : [],
-    goals: text.trim() ? ["võrrelda mitut võimalikku suunda"] : [],
-    concerns: text.trim() ? ["vajab lisainfot rollide igapäevatöö kohta"] : [],
-    summary: text.trim() ? "Kasutaja soovib suunda täpsustada ja valikuid praktiliselt võrrelda." : "Vaba teksti sammu ei täidetud.",
+    tags: hasText ? ["huvi täpsustamine", "praktiline katsetamine"] : [],
+    goals: hasText ? ["võrrelda mitut võimalikku suunda"] : [],
+    concerns: hasText ? ["vajab lisainfot rollide igapäevatöö kohta"] : [],
+    interestScores: hasText ? demoInterestScores.slice(0, 4).map((item) => ({ ...item, score: Math.max(45, item.score - 10) })) : [],
+    skillScores: hasText ? demoSkillScores.slice(0, 4).map((item) => ({ ...item, score: Math.max(45, item.score - 8) })) : [],
+    summary: hasText ? "Kasutaja soovib suunda täpsustada ja valikuid praktiliselt võrrelda." : "Vaba teksti sammu ei täidetud.",
     source: "mock",
     message,
   };
@@ -44,7 +49,7 @@ export function mockFreeText(text = "", message?: string) {
 export function mockProfile(message?: string) {
   return {
     summary:
-      "Sinu sisestatud andmete põhjal paistab, et sind huvitavad eelkõige inimesed, ühiskondlikud teemad ja eneseväljendus. Selle põhjal võiksid edasi uurida suundi, kus on ühendatud inimeste toetamine, info mõtestamine ja suhtlemine.",
+      "Minu praegune arusaam sinust on, et sind võivad kõnetada suunad, kus saab korraga **mõelda**, inimestega suhelda ja midagi päriselt ära teha. Sinu profiilis paistab olevat vajadus tähenduse järele: ainult teooria või ainult rutiinne töö ei pruugi olla kõige tugevam sobivus.\n\nHuvide poolelt tulevad esile **sotsiaalne huvi** ja **uuriv huvi**. Oskuste poolelt toetavad seda **suhtlemine**, **koostöö** ja **info mõtestamine**, mis võib sobida valdkondadesse, kus on vaja kuulata, küsida ja teha praktilisi järeldusi.\n\nSamas ei ole see lõplik hinnang. Seda tasub võtta kui esimest hüpoteesi, mida sina saad kohe parandada: võib-olla peaks rohkem arvestama **tehnoloogia**, looduse, loomade, bioloogia või mõne muu konkreetse huviga.",
     possibleJobDirections: ["noorsootöötaja", "personalispetsialist", "kommunikatsioonispetsialist", "sotsiaaltöötaja", "karjäärinõustaja"],
     possibleEducationDirections: ["noorsootöö", "sotsiaaltöö", "kommunikatsioon", "haridusteadused", "personalijuhtimine"],
     source: "mock",

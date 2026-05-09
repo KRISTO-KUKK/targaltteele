@@ -2,14 +2,21 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import multer from "multer";
+import path from "node:path";
 import { analyzeFreeText, analyzeProfileSummary, analyzeTest } from "./analyze";
-import { hasApiKey } from "./openaiClient";
+import { extractTextFromUpload } from "./extractText";
 import { mockTest } from "./mock";
 
-dotenv.config();
+const runtimeDirectory = typeof __dirname === "string" ? __dirname : process.cwd();
+
+dotenv.config({ path: path.resolve(runtimeDirectory, ".env"), quiet: true });
 
 const app = express();
 const port = Number(process.env.PORT || 8787);
+const isProduction = process.env.NODE_ENV === "production";
+const allowedOrigin = process.env.ALLOWED_ORIGIN?.split(",").map((origin) => origin.trim()).filter(Boolean);
+const clientDirectory = path.resolve(runtimeDirectory, "dist");
+const appBasePath = normalizeBasePath(process.env.APP_BASE_PATH || "");
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },
@@ -19,28 +26,39 @@ const upload = multer({
   },
 });
 
-app.use(cors({ origin: true }));
+if (allowedOrigin?.length) {
+  app.use(cors({ origin: allowedOrigin }));
+} else if (!isProduction) {
+  app.use(cors({ origin: true }));
+}
 app.use(express.json({ limit: "1mb" }));
 
-app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, apiKeyConfigured: hasApiKey() });
+const apiRouter = express.Router();
+
+apiRouter.get("/health", (_req, res) => {
+  res.json({ ok: true });
 });
 
-app.post("/api/analyze/interests", upload.single("file"), async (req, res) => {
+apiRouter.post("/analyze/interests", upload.single("file"), async (req, res) => {
   res.json(await analyzeUploadedTest("interests", req.body.text, req.file));
 });
 
-app.post("/api/analyze/skills", upload.single("file"), async (req, res) => {
+apiRouter.post("/analyze/skills", upload.single("file"), async (req, res) => {
   res.json(await analyzeUploadedTest("skills", req.body.text, req.file));
 });
 
-app.post("/api/analyze/free-text", async (req, res) => {
+apiRouter.post("/analyze/free-text", async (req, res) => {
   res.json(await analyzeFreeText(String(req.body.text ?? "")));
 });
 
-app.post("/api/analyze/profile-summary", async (req, res) => {
+apiRouter.post("/analyze/profile-summary", async (req, res) => {
   res.json(await analyzeProfileSummary(req.body));
 });
+
+app.use("/api", apiRouter);
+if (appBasePath) {
+  app.use(`${appBasePath}/api`, apiRouter);
+}
 
 app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   if (error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE") {
@@ -50,23 +68,48 @@ app.use((error: unknown, _req: express.Request, res: express.Response, _next: ex
   res.status(400).json({ message: "Faili ei saanud töödelda. Palun kleebi tulemuse tekst või kasuta demoandmeid." });
 });
 
+if (isProduction) {
+  app.use(appBasePath || "/", express.static(clientDirectory));
+  app.use((req, res, next) => {
+    const isAppRoute = !appBasePath || req.path === appBasePath || req.path.startsWith(`${appBasePath}/`);
+    if (req.method === "GET" && isAppRoute && !req.path.includes("/api/")) {
+      res.sendFile(path.join(clientDirectory, "index.html"));
+      return;
+    }
+    next();
+  });
+}
+
 app.listen(port, () => {
   console.log(`Targalt teele API server listening on http://127.0.0.1:${port}`);
 });
 
-async function analyzeUploadedTest(kind: "interests" | "skills", text = "", file?: Express.Multer.File) {
-  const fileText = extractText(file);
-  if (file && !fileText && file.mimetype === "application/pdf") {
-    return mockTest(kind, "PDF võeti vastu, kuid prototüübis ei õnnestunud sellest teksti kindlalt välja lugeda. Kasutasime demoandmeid.");
-  }
-  if (file && !fileText && file.mimetype.startsWith("image/")) {
-    return mockTest(kind, "Pilt võeti vastu, kuid pildilt tulemuse lugemine pole praegu saadaval. Kasutasime demoandmeid.");
-  }
-  return analyzeTest(kind, [text, fileText].filter(Boolean).join("\n\n"));
+function normalizeBasePath(value: string) {
+  const trimmed = value.trim().replace(/\/+$/, "");
+  if (!trimmed || trimmed === "/") return "";
+  return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
 }
 
-function extractText(file?: Express.Multer.File) {
-  if (!file) return "";
-  if (file.mimetype === "text/plain") return file.buffer.toString("utf8");
-  return "";
+async function analyzeUploadedTest(kind: "interests" | "skills", text = "", file?: Express.Multer.File) {
+  try {
+    const extracted = await extractTextFromUpload(kind, file);
+    const combinedText = [text, extracted.text].filter(Boolean).join("\n\n");
+    if (!combinedText.trim() && file) {
+      return mockTest(kind, "Fail võeti vastu, aga sellest ei õnnestunud loetavat teksti kätte saada. Proovi tulemuse tekst käsitsi kleepida või laadi selgem pilt.");
+    }
+    const result = await analyzeTest(kind, combinedText);
+    return {
+      ...result,
+      extractedTextFile: extracted.savedPath,
+      extractedTextMethod: extracted.method,
+    };
+  } catch {
+    if (file?.mimetype.startsWith("image/")) {
+      return mockTest(kind, "Pildi OCR ei õnnestunud. Proovi selgemat pilti või kleebi tulemuse tekst käsitsi.");
+    }
+    if (file?.mimetype === "application/pdf") {
+      return mockTest(kind, "PDF-i teksti ei õnnestunud välja lugeda. Proovi tulemuse tekst käsitsi kleepida või laadi pilt.");
+    }
+    return mockTest(kind, "Faili teksti ei õnnestunud töödelda. Proovi tulemuse tekst käsitsi kleepida.");
+  }
 }

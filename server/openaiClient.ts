@@ -1,7 +1,10 @@
 import OpenAI from "openai";
 import dotenv from "dotenv";
+import path from "node:path";
 
-dotenv.config();
+const runtimeDirectory = typeof __dirname === "string" ? __dirname : process.cwd();
+
+dotenv.config({ path: path.resolve(runtimeDirectory, ".env"), quiet: true });
 
 export function hasApiKey() {
   return Boolean(process.env.OPENAI_API_KEY);

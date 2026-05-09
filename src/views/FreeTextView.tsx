@@ -19,7 +19,7 @@ export function FreeTextView({ onDone }: { onDone: (text: string, analysis: Free
   return (
     <section className="stack">
       <div className="sectionTitle">
-        <p className="eyebrow">3. samm</p>
+        <p className="eyebrow">2. samm</p>
         <h1>Lisa oma mõtted</h1>
         <p>Kirjuta vabas vormis, mis sind praegu huvitab, mida tulevikus kaalud või mille osas kahtled. See samm on vabatahtlik.</p>
       </div>
