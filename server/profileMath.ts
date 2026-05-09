@@ -1,4 +1,5 @@
 import { taxonomy, type Profile12d } from "./dataset";
+import { normalizeForMatch } from "./signals";
 
 export const INTEREST_WEIGHT = 1.2;
 export const SKILL_WEIGHT = 1.0;
@@ -50,18 +51,22 @@ export function distanceToScore(distance: number): number {
 }
 
 export function collectUserKeywords(input: {
+  freeText?: string;
   tags?: string[];
   selectedDomains?: string[];
   freeTextGoals?: string[];
   freeTextConcerns?: string[];
+  aiSummary?: string;
 }): Set<string> {
   const out = new Set<string>();
   const add = (value: string) => {
-    const normalized = value.toLocaleLowerCase("et-EE").trim();
+    const normalized = normalizeForMatch(value);
     if (normalized.length >= 3) out.add(normalized);
   };
   for (const tag of input.tags ?? []) add(tag);
   for (const domain of input.selectedDomains ?? []) add(domain);
+  for (const word of (input.freeText ?? "").split(/[\s,;.?!:()"/]+/)) add(word);
+  for (const word of (input.aiSummary ?? "").split(/[\s,;.?!:()"/]+/)) add(word);
   for (const goal of input.freeTextGoals ?? []) {
     for (const word of goal.split(/[\s,;]+/)) add(word);
   }

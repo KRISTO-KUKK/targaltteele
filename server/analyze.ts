@@ -1,7 +1,8 @@
 import { createOpenAIClient, getModel } from "./openaiClient";
 import { mockFreeText, mockProfile, mockTest } from "./mock";
-import { normalizeScores, taxonomyPrompt } from "./taxonomy";
+import { interestDimensions, normalizeScores, skillDimensions, taxonomyPrompt } from "./taxonomy";
 import { parseTestText } from "./parseTestText";
+import { extractUserSignals } from "./signals";
 
 const fallbackMessage = "AI analüüs ei olnud hetkel saadaval. Näidisandmeid ei kasutata; jätkame ainult sinu sisestatud andmetega.";
 const quotaMessage =
@@ -80,7 +81,7 @@ function normalizeTestAnalysis(result: any, kind: "interests" | "skills") {
 }
 
 const baseInstruction =
-  "Analüüsi kasutaja minukarjäär.ee testi tulemust. Ära diagnoosi. Ära tee lõplikke järeldusi. Tõlgenda tulemust karjääri- ja õpitee planeerimise abivahendina. Vasta ainult JSON-ina. Tekstid peavad olema eesti keeles. Kasuta 0-100 skoore ainult indikatiivse tugevusena.";
+  "Analüüsi kasutaja minukarjäär.ee testi tulemust. Ära diagnoosi. Ära tee lõplikke järeldusi. Tõlgenda testi ainult pehme suunava taustsignaalina, mitte lõpliku soovituse peamise alusena. Õpilase enda tekst ja märgitud huvid/valdkonnad on hilisemates soovitustes tähtsamad. Vasta ainult JSON-ina. Tekstid peavad olema eesti keeles. Kasuta 0-100 skoore ainult indikatiivse tugevusena.";
 
 const interestShape =
   '{"scores":[{"key":"sotsiaalne","label":"Sotsiaalne huvi","score":86,"tags":["inimesed"]}],"tags":["inimesed"],"summary":"Lühike kokkuvõte."}';
@@ -158,22 +159,135 @@ async function analyzeTestContent(kind: "interests" | "skills", content: UserCon
 }
 
 export async function analyzeFreeText(text: string) {
-  if (!text.trim()) return mockFreeText(text);
+  const started = Date.now();
+  console.log("[api] free-text:start", {
+    at: new Date().toISOString(),
+    textLength: text.length,
+    hasText: Boolean(text.trim()),
+  });
+  if (!text.trim()) {
+    console.log("[api] free-text:empty", { at: new Date().toISOString(), durationMs: Date.now() - started });
+    return mockFreeText(text);
+  }
   try {
+    console.log("[api] free-text:ai-start", { at: new Date().toISOString() });
     const result = await withTimeout(
       askJson(
-        `Analüüsi õpilase vaba teksti karjääri- ja õpitee planeerimise vaatest. Ära diagnoosi. Ära tee lõplikke järeldusi. Lisaks kokkuvõttele tuleta tekstist indikatiivsed huvid ja oskused, et süsteem saaks soovitusi teha ka siis, kui teste ei täideta. ${taxonomyPrompt("combined")} Paiguta kasutaja tekst alati kõige lähemasse olemasolevasse kategooriasse ja ära loo uusi key väärtusi. Kasuta 0-100 skoore ettevaatliku signaalina, mitte testitulemusena. Vasta ainult JSON-ina kujuga ${combinedShape}. Eesti keeles.`,
+        `Analüüsi õpilase vaba teksti karjääri- ja õpitee planeerimise vaatest. Ära diagnoosi. Ära tee lõplikke järeldusi. Õpilase enda sõnad on soovituste kõige tähtsam sisend; testitulemused on hiljem ainult pehme taustsignaal. Lisaks kokkuvõttele tuleta tekstist indikatiivsed huvid ja oskused, et süsteem saaks soovitusi teha ka siis, kui teste ei täideta. ${taxonomyPrompt("combined")} Paiguta kasutaja tekst alati kõige lähemasse olemasolevasse kategooriasse ja ära loo uusi key väärtusi. Kasuta 0-100 skoore ettevaatliku signaalina, mitte testitulemusena. Vasta ainult JSON-ina kujuga ${combinedShape}. Eesti keeles.`,
         text,
       ),
     );
-    return { ...normalizeCombinedAnalysis(result), source: "ai" };
+    const normalized = normalizeCombinedAnalysis(result);
+    console.log("[api] free-text:ai-done", {
+      at: new Date().toISOString(),
+      durationMs: Date.now() - started,
+      tagCount: normalized.tags.length,
+      interestScoreCount: normalized.interestScores.length,
+      skillScoreCount: normalized.skillScores.length,
+    });
+    return { ...normalized, source: "ai" };
   } catch (error) {
-    return mockFreeText(text, fallbackFor(error));
+    console.log("[api] free-text:fallback", {
+      at: new Date().toISOString(),
+      durationMs: Date.now() - started,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    const message = fallbackFor(error);
+    const shouldNotify = message === quotaMessage;
+    return localFreeTextAnalysis(text, shouldNotify ? message : undefined);
   }
 }
 
+function localFreeTextAnalysis(text: string, message?: string) {
+  const extraction = extractUserSignals({ freeText: text });
+  const signalKeys = new Set(extraction.signals.map((signal) => signal.key));
+  const interestWeights = new Map<string, number>();
+  const skillWeights = new Map<string, number>();
+
+  const addInterest = (key: string, weight: number) => interestWeights.set(key, (interestWeights.get(key) ?? 0) + weight);
+  const addSkill = (key: string, weight: number) => skillWeights.set(key, (skillWeights.get(key) ?? 0) + weight);
+
+  for (const signal of extraction.signals) {
+    const weight = Math.max(1, signal.weight);
+    if (["andmeanaluus", "matemaatika", "bioloogia", "keemia", "fuusika", "tehisintellekt"].includes(signal.key)) {
+      addInterest("uuriv", weight);
+      addSkill("analuus_info", weight);
+    }
+    if (["rahandus", "ettevotlus", "juhtimine", "avalik_sektor"].includes(signal.key)) {
+      addInterest("ettevotlik", weight);
+      addSkill("ettevotlikkus_organiseerimine", weight);
+    }
+    if (["juhtimine"].includes(signal.key)) addSkill("juhtimine_eestvedamine", weight);
+    if (["meedia", "kirjutamine", "disain", "kunst", "mangud", "muusika"].includes(signal.key)) {
+      addInterest("loominguline", weight);
+      addSkill("loovus_uldistamine", weight);
+    }
+    if (["inimesed", "sotsiaaltoo", "opetamine", "noortetoo", "psuhholoogia", "meditsiin", "turism"].includes(signal.key)) {
+      addInterest("sotsiaalne", weight);
+      addSkill("suhtlemine_koostoo", weight);
+    }
+    if (["praktiline", "inseneeria", "robootika", "ehitus", "transport", "loomad"].includes(signal.key)) {
+      addInterest("praktiline", weight);
+    }
+    if (["andmeanaluus", "rahandus", "oigus", "transport"].includes(signal.key)) {
+      addInterest("susteemne", weight * 0.75);
+    }
+  }
+
+  const interestScores = weightsToScores(interestWeights, interestDimensions);
+  const skillScores = weightsToScores(skillWeights, skillDimensions);
+  const tags = Array.from(
+    new Set([
+      ...extraction.signals.map((signal) => signal.label),
+      ...extraction.buzzwords,
+    ]),
+  ).slice(0, 12);
+  const topSignals = extraction.signals.slice(0, 5).map((signal) => signal.label);
+  const goals = inferGoals(signalKeys);
+  const summary = topSignals.length
+    ? `Tekstist leitud põhisignaalid: ${topSignals.join(", ")}. Kasutan neid soovitustes peamise sisendina ning testitulemusi ainult taustakontrollina.`
+    : `Vaba tekst salvestati. Kasutan soovitustes õpilase enda sisestatud teksti ning testitulemusi ainult taustakontrollina.`;
+
+  return {
+    tags,
+    goals,
+    concerns: [],
+    interestScores,
+    skillScores,
+    summary,
+    source: "mock" as const,
+    message,
+  };
+}
+
+function weightsToScores(weights: Map<string, number>, dimensions: Array<{ key: string; label: string; tags: string[] }>) {
+  return Array.from(weights.entries())
+    .map(([key, weight]) => {
+      const dimension = dimensions.find((item) => item.key === key);
+      if (!dimension) return null;
+      return {
+        ...dimension,
+        score: Math.max(45, Math.min(86, Math.round(46 + weight * 6))),
+      };
+    })
+    .filter((item): item is { key: string; label: string; score: number; tags: string[] } => Boolean(item))
+    .sort((a, b) => b.score - a.score);
+}
+
+function inferGoals(signalKeys: Set<string>) {
+  const goals: string[] = [];
+  if (signalKeys.has("rahandus")) goals.push("uurida rahanduse, investeerimise või analüütika suundi");
+  if (signalKeys.has("meedia")) goals.push("võrrelda turunduse ja kommunikatsiooni võimalusi");
+  if (signalKeys.has("ettevotlus")) goals.push("leida ettevõtluse ja juhtimisega seotud praktilisi õppimisvõimalusi");
+  if (signalKeys.has("andmeanaluus")) goals.push("katsetada andmeanalüüsi või analüütiku rolliga seotud teemasid");
+  return goals.slice(0, 4);
+}
+
 export async function analyzeProfileSummary(payload: unknown) {
+  const started = Date.now();
+  const mode = typeof payload === "object" && payload && "mode" in payload ? String((payload as { mode?: unknown }).mode) : "unknown";
   try {
+    console.log("[api] profile-summary:ai-start", { at: new Date().toISOString(), mode });
     const result = await withTimeout(
       askJson(
         `Koosta kasutajale suunatud AI peegeldus sellest, kuidas süsteem tema huvidest, oskustest, tekstist, valdkonnavalikust ja testitulemustest aru sai.
@@ -181,21 +295,28 @@ export async function analyzeProfileSummary(payload: unknown) {
 Kui payload sisaldab userCorrection välja, võta seda parandust kõige olulisema sisendina, korrigeeri varasemat arusaama ja ära vaidle kasutajaga.
 
 OLULINE KAALUMINE — ÄRA IGNOREERI ÜHTKI ALLIKAT, ARVESTA NEID ERINEVALT:
-- Testide 0-100 NUMBRID on usaldusväärsed kvantitatiivsed signaalid kuue huvi- ja kuue oskusekategooria tugevuse kohta. Need näitavad selgeid suundumusi ja peavad kokkuvõttes esinema (näiteks "tugevamad huvid paistavad olevat uuriv ja sotsiaalne, oskuste poolelt analüüs ja info mõtestamine"). Kasuta neid suunaandvalt.
-- Testide pikem KIRJELDAV TEKST (need lõigud nagu "Sa oskad inimesi tegevustesse haarata..." või "Sotsiaalse tüübi inimesi iseloomustatakse...") on testi enda ÜLDINE tüüpkirjeldus, mitte konkreetselt selle õpilase kohta käiv tekst. Võta seda ettevaatlikult: ära tsiteeri seda otseselt ega esita seda õpilase enda omadusena. See toetab numbrilist suunda, kuid ei asenda õpilase enda häält.
-- Kasutaja VABA TEKST, valitud valdkonnad, eesmärgid ja sildid kirjeldavad teda ISIKLIKULT — sealt tulevad konkreetsed teemad. Need peavad olema märksõnade ja konkreetsete viidete peamine allikas. Maini sealt 1-3 konkreetset teemat (nt bioloogia, AI, loomad, muusika, ettevõtlus, IT, tervis, loovus), kui need esinevad.
-- Kui vaba tekst või valdkonnad lähevad numbrite suunaga vastuollu, too see vastuolu välja ettevaatlikult ja jäta tõlgendus kasutajale lahtiseks.
+- Kasutaja VABA TEKST, valitud valdkonnad, eesmärgid ja sildid on kõige tähtsam sisend. Need kirjeldavad, mida õpilane ise ütles ja ise huvina märkis. Sealt peavad tulema konkreetsed teemad ja märksõnad. Maini sealt 1-3 konkreetset teemat (nt bioloogia, AI, loomad, muusika, ettevõtlus, IT, tervis, loovus), kui need esinevad.
+- Testide 0-100 NUMBRID on ainult pehme suunav taustsignaal. Need võivad kinnitada või nüansseerida õpilase enda sõnu, aga ei tohi neid üle kirjutada ega üksi soovituse loogikat juhtida.
+- Testide pikem KIRJELDAV TEKST (need lõigud nagu "Sa oskad inimesi tegevustesse haarata..." või "Sotsiaalse tüübi inimesi iseloomustatakse...") on testi enda ÜLDINE tüüpkirjeldus, mitte konkreetselt selle õpilase kohta käiv tekst. Ära tsiteeri seda otseselt ega esita seda õpilase enda omadusena.
+- Kui vaba tekst või valitud valdkonnad lähevad testinumbrite suunaga vastuollu, usalda esmalt õpilase enda sõnu ja too vastuolu välja ettevaatlikult.
 
-Tee summary keskmise pikkusega: 3 sisukat lõiku, igas lõigus 2-3 lauset, kokku umbes 130-190 sõna. Esimene lõik räägib üldisest muljest inimesena, sidudes vaba teksti, valdkonnad ja test­ide tugevama suuna. Teine lõik seob kokku konkreetsed teemahuvid (peamiselt vabast tekstist ja siltidest) ning toetab neid testikategooriate numbritega ("uuriv 85%, analüüs 80% — paistab, et..."). Kolmas lõik kirjeldab sobivat õppimis- või töökeskkonda ja nimetab, millised oletused vajavad kasutaja kinnitust.
+Tee summary keskmise pikkusega: 3 sisukat lõiku, igas lõigus 2-3 lauset, kokku umbes 130-190 sõna. Esimene lõik räägib üldisest muljest, alustades vaba teksti ja valitud valdkondade konkreetsetest teemadest. Teine lõik võib mainida testikategooriaid lühidalt pehme taustana ("testid toetavad seda suunda ettevaatlikult..."), aga ära lase neil domineerida. Kolmas lõik kirjeldab sobivat õppimis- või töökeskkonda ja nimetab, millised oletused vajavad kasutaja kinnitust.
 Tõsta summary sees 4-7 olulisemat märksõna või fraasi Markdowni boldiga esile. Konkreetsed teemad (**bioloogia**, **AI**, **loomad**) tulgu peamiselt vabast tekstist; testikategooriate nimed (**uuriv huvi**, **analüüs**) sobivad samuti, kui numbrid neid selgelt esile toovad. Ära tee terveid lauseid boldiks.
-Kirjuta nii, et kasutaja tunneks, et süsteem päriselt luges tema teksti JA arvestas testitulemusi. Väldi üldist karjäärinõustamise juttu.
+Kirjuta nii, et kasutaja tunneks, et süsteem päriselt luges tema teksti ja märgitud huvisid; testitulemused on ainult taust. Väldi üldist karjäärinõustamise juttu.
 Kasuta ainult ettevaatlikke sõnastusi: "paistab", "võib viidata", "tasub uurida". Võimalikud ametid ja edasiõppimise suunad pane eraldi massiividesse ning hoia need lühikesed.
 Vasta ainult JSON-ina kujuga {"summary":"","possibleJobDirections":[],"possibleEducationDirections":[]}. Eesti keeles.`,
         JSON.stringify(payload),
       ),
     );
+    console.log("[api] profile-summary:ai-done", { at: new Date().toISOString(), mode, durationMs: Date.now() - started });
     return { ...result, source: "ai" };
   } catch (error) {
+    console.log("[api] profile-summary:fallback", {
+      at: new Date().toISOString(),
+      mode,
+      durationMs: Date.now() - started,
+      message: error instanceof Error ? error.message : String(error),
+    });
     return mockProfile(payload, fallbackFor(error));
   }
 }

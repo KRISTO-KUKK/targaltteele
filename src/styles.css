@@ -410,6 +410,13 @@ button.active,
   background: rgba(255, 253, 248, 0.72);
 }
 
+.recommendReason {
+  border-left: 3px solid var(--leaf);
+  padding-left: 10px;
+  color: #27372f;
+  font-weight: 750;
+}
+
 .facts {
   display: grid;
   gap: 12px;

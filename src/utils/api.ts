@@ -59,16 +59,31 @@ export async function analyzeTest(kind: "interests" | "skills", text: string, fi
 }
 
 export async function analyzeFreeText(text: string): Promise<FreeTextAnalysis> {
+  const started = performance.now();
   try {
-    return await readJson<FreeTextAnalysis>(
+    logApi("free-text:start", { textLength: text.length, hasText: Boolean(text.trim()) });
+    const result = await readJson<FreeTextAnalysis>(
       await fetchWithTimeout(apiUrl("/api/analyze/free-text"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
       }),
     );
-  } catch {
-    return mockFreeTextAnalysis(text, "AI analüüs ei olnud hetkel saadaval. Näidisandmeid ei kasutata; jätkame ainult sinu sisestatud tekstiga.");
+    logApi("free-text:done", {
+      durationMs: Math.round(performance.now() - started),
+      source: result.source,
+      tagCount: result.tags.length,
+      interestScoreCount: result.interestScores.length,
+      skillScoreCount: result.skillScores.length,
+      hasMessage: Boolean(result.message),
+    });
+    return result;
+  } catch (error) {
+    logApi("free-text:fallback", {
+      durationMs: Math.round(performance.now() - started),
+      message: error instanceof Error ? error.message : String(error),
+    });
+    return mockFreeTextAnalysis(text);
   }
 }
 
@@ -83,13 +98,32 @@ export type RecommendationInput = {
   aiSummary: string;
 };
 
+const inFlightRecommendations = new Map<string, Promise<RecommendationResponse>>();
+
 export async function getRecommendations(payload: RecommendationInput): Promise<RecommendationResponse> {
-  const response = await fetchWithTimeout(apiUrl("/api/recommend"), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+  const key = JSON.stringify(payload);
+  const existing = inFlightRecommendations.get(key);
+  if (existing) return existing;
+  const request = (async () => {
+    logApi("recommend:start", {
+      interestScoreCount: payload.interestScores.length,
+      skillScoreCount: payload.skillScores.length,
+      selectedDomainCount: payload.selectedDomains.length,
+      freeTextLength: payload.freeText.length,
+    });
+    const response = await fetchWithTimeout(apiUrl("/api/recommend"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const result = await readJson<RecommendationResponse>(response);
+    logApi("recommend:done", { source: result.source, curriculumCount: result.refinedCurricula.length, courseCount: result.suggestedCourses.length });
+    return result;
+  })().finally(() => {
+    inFlightRecommendations.delete(key);
   });
-  return readJson<RecommendationResponse>(response);
+  inFlightRecommendations.set(key, request);
+  return request;
 }
 
 export type CatalogQuery = {
@@ -125,15 +159,25 @@ export function getCatalogJobs(payload: CatalogQuery) {
 }
 
 export async function analyzeProfileSummary(payload: unknown): Promise<ProfileSummary> {
+  const started = performance.now();
+  const mode = typeof payload === "object" && payload && "mode" in payload ? String((payload as { mode?: unknown }).mode) : "unknown";
   try {
-    return await readJson<ProfileSummary>(
+    logApi("profile-summary:start", { mode });
+    const result = await readJson<ProfileSummary>(
       await fetchWithTimeout(apiUrl("/api/analyze/profile-summary"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       }),
     );
-  } catch {
+    logApi("profile-summary:done", { mode, durationMs: Math.round(performance.now() - started), hasMessage: Boolean(result.message) });
+    return result;
+  } catch (error) {
+    logApi("profile-summary:fallback", {
+      mode,
+      durationMs: Math.round(performance.now() - started),
+      message: error instanceof Error ? error.message : String(error),
+    });
     return mockProfileSummary(payload, "AI analüüs ei olnud hetkel saadaval. Näidisandmeid ei kasutata; jätkame ainult sinu sisestatud profiiliandmetega.");
   }
 }

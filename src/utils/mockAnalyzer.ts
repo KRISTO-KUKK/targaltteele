@@ -73,6 +73,32 @@ function formatTopScores(scores: unknown) {
 }
 
 function extractKeywords(text: string) {
-  const lowered = text.toLowerCase();
-  return ["bioloogia", "loomad", "ai", "it", "tervis", "muusika", "ettevõtlus", "loovus", "tehnoloogia", "inimesed", "loodus"].filter((keyword) => lowered.includes(keyword));
+  const lowered = text.toLocaleLowerCase("et-EE");
+  function containsTerm(textValue: string, term: string) {
+    const normalizedTerm = term.toLocaleLowerCase("et-EE");
+    const tokens = textValue.split(/[^a-z0-9õäöüšž]+/i).filter(Boolean);
+    if (normalizedTerm.length <= 3) return tokens.includes(normalizedTerm);
+    return tokens.some((token) => token === normalizedTerm || token.startsWith(normalizedTerm));
+  }
+  const keywords = [
+    "bioloogia",
+    "loomad",
+    "ai",
+    "it",
+    "tervis",
+    "muusika",
+    "ettevõtlus",
+    "ettevotlus",
+    "loovus",
+    "tehnoloogia",
+    "inimesed",
+    "loodus",
+    "rahandus",
+    "investeerimine",
+    "marketing",
+    "turundus",
+    "analyst",
+    "trader",
+  ];
+  return keywords.filter((keyword) => containsTerm(lowered, keyword));
 }

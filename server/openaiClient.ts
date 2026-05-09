@@ -14,11 +14,16 @@ export function getModel() {
   return process.env.OPENAI_MODEL || "gpt-5.5";
 }
 
+export function getOpenAITimeoutMs() {
+  const parsed = Number(process.env.OPENAI_TIMEOUT_MS);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 12000;
+}
+
 export function createOpenAIClient() {
   if (!process.env.OPENAI_API_KEY) return null;
   return new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
     maxRetries: 0,
-    timeout: 20000,
+    timeout: getOpenAITimeoutMs(),
   });
 }

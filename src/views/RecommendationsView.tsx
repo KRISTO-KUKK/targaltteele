@@ -53,7 +53,7 @@ export function RecommendationsView({ state, setView }: { state: AppState; setVi
       <div className="sectionTitle">
         <p className="eyebrow">Soovitused</p>
         <h1>Sulle sobivad suunad</h1>
-        <p>Kombineerime sinu testitulemused, vaba teksti ja valitud valdkonnad. Esmalt arvutame matemaatiliselt parimad sobitused, seejärel laseme AI-l valikut peenhäälestada.</p>
+        <p>Alustame sinu enda tekstist, valitud valdkondadest ja märksõnadest. Testitulemused jäävad taustasignaaliks, mille põhjal kontrollime, kas suund toetub ka profiilile.</p>
       </div>
 
       {status === "loading" && <Notice>Arvutame ja koostame soovitusi...</Notice>}
@@ -87,6 +87,7 @@ export function RecommendationsView({ state, setView }: { state: AppState; setVi
                     <a href={course.link} target="_blank" rel="noreferrer">
                       <strong>{course.pealkiri}</strong>
                     </a>
+                    {course.reason && <p className="recommendReason">{course.reason}</p>}
                     <p>{course.sisu.slice(0, 220)}{course.sisu.length > 220 ? "…" : ""}</p>
                     {course.tags.length > 0 && (
                       <div className="chipRow">
@@ -139,8 +140,19 @@ function CurriculumCard({ curriculum }: { curriculum: CurriculumMatch }) {
       <h3>{curriculum.pealkiri}</h3>
       <div className="metaLine">
         <span>Sobivusskoor {curriculum.matchScore}</span>
+        {typeof curriculum.signalScore === "number" && <span>Sisukattuvus {curriculum.signalScore}</span>}
         <span>Kood {curriculum.kood}</span>
       </div>
+      {curriculum.reason && <p className="recommendReason">{curriculum.reason}</p>}
+      {curriculum.matchedSignals && curriculum.matchedSignals.length > 0 && (
+        <div className="chipRow">
+          {curriculum.matchedSignals.slice(0, 5).map((signal) => (
+            <span className="chip" key={signal}>
+              {signal}
+            </span>
+          ))}
+        </div>
+      )}
       {curriculum.sisu && <p>{curriculum.sisu.slice(0, 280)}{curriculum.sisu.length > 280 ? "…" : ""}</p>}
       {curriculum.url && (
         <p>
@@ -158,6 +170,7 @@ function FieldCard({ field }: { field: FieldMatch }) {
     <article className="card">
       <p className="eyebrow">Valdkond · sobivus {field.matchScore}</p>
       <h3>{field.nimi}</h3>
+      {typeof field.signalScore === "number" && field.signalScore > 0 && <p className="muted">Sisukattuvus sinu tekstiga: {field.signalScore}</p>}
       {field.kirjeldus && <p>{field.kirjeldus.slice(0, 240)}{field.kirjeldus.length > 240 ? "…" : ""}</p>}
       {field.sampleAmetid.length > 0 && (
         <>

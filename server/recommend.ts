@@ -7,9 +7,16 @@ import {
   type Amet,
   type Curriculum,
   type ExtraCourse,
+  type Field,
   type Profile12d,
 } from "./dataset";
 import { buildProfile, collectUserKeywords, distanceToScore, weightedDistance } from "./profileMath";
+import {
+  extractUserSignals,
+  scoreTextAgainstSignals,
+  summarizeSignals,
+  type SignalExtraction,
+} from "./signals";
 
 export type RecommendInput = {
   interestScores?: Array<{ key: string; score: number }>;
@@ -29,6 +36,11 @@ export type CurriculumMatch = {
   sisu: string;
   url: string | null;
   matchScore: number;
+  testScore: number;
+  signalScore: number;
+  tier: string;
+  matchedSignals: string[];
+  reason?: string;
 };
 
 export type FieldMatch = {
@@ -37,6 +49,8 @@ export type FieldMatch = {
   kirjeldus: string;
   tags: string[];
   matchScore: number;
+  testScore: number;
+  signalScore: number;
   sampleAmetid: Amet[];
 };
 
@@ -45,6 +59,9 @@ export type CourseSuggestion = {
   pealkiri: string;
   sisu: string;
   tags: string[];
+  signalScore: number;
+  matchedSignals: string[];
+  reason?: string;
 };
 
 export type RecommendationResponse = {
@@ -57,41 +74,93 @@ export type RecommendationResponse = {
   message?: string;
 };
 
-export function matchTopCurricula(profile: Profile12d, limit = 15): CurriculumMatch[] {
-  const scored = curricula
-    .filter((curriculum): curriculum is Curriculum & { profile: Profile12d } => curriculum.profile !== null)
-    .map((curriculum) => {
-      const distance = weightedDistance(profile, curriculum.profile);
-      return {
-        kood: curriculum.kood,
-        pealkiri: curriculum.pealkiri,
-        oppeaste: curriculum.oppeaste,
-        sisu: curriculum.sisu,
-        url: curriculum.url,
-        matchScore: distanceToScore(distance),
-        _distance: distance,
-      };
-    })
-    .sort((a, b) => a._distance - b._distance)
-    .slice(0, limit)
-    .map(({ _distance, ...rest }) => rest);
-  return scored;
+type CourseCandidate = ExtraCourse & {
+  signalScore: number;
+  matchedSignals: string[];
+  matchedBuzzwords: string[];
+};
+
+function hasSpecificSignals(extraction: SignalExtraction) {
+  return extraction.signals.length > 0 || extraction.buzzwords.length > 0;
 }
 
-export function matchTopFields(profile: Profile12d, limit = 6): FieldMatch[] {
+function tierFor(signalScore: number, testScore: number, hasSignals: boolean) {
+  if (!hasSignals) {
+    if (testScore >= 78) return "A: testipõhine varusuund";
+    if (testScore >= 66) return "B: mõõdukas testipõhine varusuund";
+    return "C: varuvariant";
+  }
+  if (signalScore >= 65) return "A: otsene kattuvus õpilase sõnade ja valikutega";
+  if (signalScore >= 32) return "B: osaline kattuvus õpilase sõnade ja valikutega";
+  return "C: ainult pehme testisignaal, tekstis nõrgem seos";
+}
+
+function buildCurriculumMatch(profile: Profile12d, curriculum: Curriculum & { profile: Profile12d }, extraction: SignalExtraction): CurriculumMatch {
+  const testScore = distanceToScore(weightedDistance(profile, curriculum.profile));
+  const signalMatch = scoreTextAgainstSignals(
+    `${curriculum.pealkiri} ${curriculum.oppeaste} ${curriculum.sisu}`,
+    extraction,
+  );
+  const hasSignals = hasSpecificSignals(extraction);
+  const matchScore = hasSignals
+    ? Math.round(signalMatch.score * 0.88 + testScore * 0.12)
+    : testScore;
+
+  return {
+    kood: curriculum.kood,
+    pealkiri: curriculum.pealkiri,
+    oppeaste: curriculum.oppeaste,
+    sisu: curriculum.sisu,
+    url: curriculum.url,
+    matchScore,
+    testScore,
+    signalScore: signalMatch.score,
+    tier: tierFor(signalMatch.score, testScore, hasSignals),
+    matchedSignals: signalMatch.matchedSignals,
+  };
+}
+
+export function matchTopCurricula(profile: Profile12d, extraction: SignalExtraction, limit = 24): CurriculumMatch[] {
+  const scored = curricula
+    .filter((curriculum): curriculum is Curriculum & { profile: Profile12d } => curriculum.profile !== null)
+    .map((curriculum) => buildCurriculumMatch(profile, curriculum, extraction));
+
+  if (!hasSpecificSignals(extraction)) {
+    return scored.sort((a, b) => b.testScore - a.testScore).slice(0, limit);
+  }
+
+  const signalFirst = scored
+    .filter((candidate) => candidate.signalScore > 0)
+    .sort((a, b) => b.matchScore - a.matchScore || b.signalScore - a.signalScore || b.testScore - a.testScore);
+
+  const mathBackups = scored
+    .sort((a, b) => b.testScore - a.testScore)
+    .slice(0, 8);
+
+  return uniqueByKood([...signalFirst, ...mathBackups])
+    .sort((a, b) => b.matchScore - a.matchScore || b.signalScore - a.signalScore || b.testScore - a.testScore)
+    .slice(0, limit);
+}
+
+export function matchTopFields(profile: Profile12d, extraction: SignalExtraction, limit = 6): FieldMatch[] {
+  const hasSignals = hasSpecificSignals(extraction);
   return fields
     .map((field) => {
-      const distance = weightedDistance(profile, field.profile);
-      return { field, distance };
+      const testScore = distanceToScore(weightedDistance(profile, field.profile));
+      const signalMatch = scoreTextAgainstSignals(`${field.nimi} ${field.kirjeldus} ${field.tags.join(" ")}`, extraction);
+      const matchScore = hasSignals ? Math.round(signalMatch.score * 0.88 + testScore * 0.12) : testScore;
+      return { field, testScore, signalScore: signalMatch.score, matchScore };
     })
-    .sort((a, b) => a.distance - b.distance)
+    .sort((a, b) => b.matchScore - a.matchScore || b.signalScore - a.signalScore || b.testScore - a.testScore)
     .slice(0, limit)
-    .map(({ field, distance }) => ({
+    .map(({ field, testScore, signalScore, matchScore }) => ({
       id: field.id,
       nimi: field.nimi,
       kirjeldus: field.kirjeldus,
       tags: field.tags,
-      matchScore: distanceToScore(distance),
+      testScore,
+      signalScore,
+      matchScore,
       sampleAmetid: getAmetidForField(field.id, 5),
     }));
 }
@@ -111,55 +180,75 @@ function safeJsonParse(text: string): any {
 
 function buildLlmPayload(
   input: RecommendInput,
+  extraction: SignalExtraction,
   topCurricula: CurriculumMatch[],
-  candidateCourses: ExtraCourse[],
+  candidateCourses: CourseCandidate[],
 ) {
-  const tags = Array.from(new Set((input.tags ?? []).map((tag) => tag.trim()).filter(Boolean))).slice(0, 30);
-  const goals = (input.freeTextGoals ?? []).map((goal) => goal.trim()).filter(Boolean).slice(0, 8);
-  const concerns = (input.freeTextConcerns ?? []).map((concern) => concern.trim()).filter(Boolean).slice(0, 8);
+  const tags = Array.from(new Set((input.tags ?? []).map((tag) => tag.trim()).filter(Boolean))).slice(0, 40);
+  const goals = (input.freeTextGoals ?? []).map((goal) => goal.trim()).filter(Boolean).slice(0, 10);
+  const concerns = (input.freeTextConcerns ?? []).map((concern) => concern.trim()).filter(Boolean).slice(0, 10);
   const selectedDomains = (input.selectedDomains ?? []).map((item) => item.trim()).filter(Boolean).slice(0, 12);
 
   return {
+    evaluationPolicy:
+      "Primary: freeText, selectedDomains, tags, detectedSignals, detectedBuzzwords. Secondary soft background: testScore. If these conflict, follow the student's own text and marked interests.",
     user: {
-      freeText: (input.freeText ?? "").slice(0, 4000),
+      freeText: (input.freeText ?? "").slice(0, 5000),
       goals,
       concerns,
       tags,
       selectedDomains,
+      detectedSignals: summarizeSignals(extraction),
+      detectedBuzzwords: extraction.buzzwords.slice(0, 16),
       previousAiSummary: (input.aiSummary ?? "").slice(0, 1200),
     },
-    curricula: topCurricula.slice(0, 10).map((curriculum) => ({
+    tieredCurricula: topCurricula.slice(0, 18).map((curriculum) => ({
+      tier: curriculum.tier,
       kood: curriculum.kood,
       pealkiri: curriculum.pealkiri,
       oppeaste: curriculum.oppeaste,
-      sisu: curriculum.sisu.slice(0, 600),
+      signalScore: curriculum.signalScore,
+      testScore: curriculum.testScore,
+      combinedScore: curriculum.matchScore,
+      matchedSignals: curriculum.matchedSignals,
+      sisu: curriculum.sisu.slice(0, 700),
     })),
-    extraCourses: candidateCourses.slice(0, 40).map((course) => ({
+    extraCourses: candidateCourses.slice(0, 35).map((course) => ({
       link: course.link,
       pealkiri: course.pealkiri,
+      signalScore: course.signalScore,
+      matchedSignals: course.matchedSignals,
       tags: course.tags,
-      sisu: course.sisu.slice(0, 280),
+      sisu: course.sisu.slice(0, 320),
     })),
   };
 }
 
 const REFINER_SYSTEM_PROMPT = `Oled karjäärinõustaja, kes aitab Eesti gümnaasiumiõpilasel valida edasiõppimise suunda.
-Sulle on antud kasutaja vaba tekst (freeText), tema sõnastatud eesmärgid (goals), kahtlused (concerns), sildid (tags), valitud valdkonnad (selectedDomains) ja varasem AI peegeldus (previousAiSummary). Need kõik kirjeldavad sama inimest — võta neid tervikuna.
-Lisaks on sulle ette antud matemaatilise sobitamise põhjal eelvalitud õppekavade nimekiri (curricula) ja võimalike lisakursuste komplekt (extraCourses).
+Sinu esimene ja kõige tähtsam allikas on õpilase enda freeText, goals, selectedDomains, tags, detectedSignals ja detectedBuzzwords. Need kirjeldavad, mida õpilane ise ütles ja mida ta ise märkis huvipakkuvaks.
+Testitulemused on ainult pehme suunav taustsignaal: need aitavad kontrollida, kas soovitusel on üldine profiilitoetus, aga ei tohi üksi lõplikku valikut juhtida ega õpilase enda sõnu üle kirjutada.
 
-OLULINE KAALUMINE — ARVESTA MÕLEMA POOLEGA:
-- Testide 0-100 PROTSENDID on usaldusväärne signaal selle kohta, kuhu kasutaja huvid ja oskused laias plaanis kalduvad. Curricula-nimekiri on nende põhjal juba eelvalitud, nii et need on heaks lähtekohaks.
-- Kasutaja FREE TEXT, goals, tags ja selectedDomains kirjeldavad teda KONKREETSEMALT — milliste teemade vastu ta tegelikult huvi tunneb. Need on tähtsamad konkreetse õppekava valikul kui pelk numbriline tipp.
-- Lõpliku järjestuse otsustad nii: kasuta numbrilist eelvalikut kui taustsignaali ja vali sealt välja ned, mille sisu kattub kõige paremini kasutaja vabateksti, eesmärkide ja valitud valdkondadega. Kui tipus olev õppekava ei sobi tema sõnastatud huvidega üldse, eelista madalamal järjekohal olevat, mis sobib.
-- Testitulemustega kaasnevaid tüüpkirjeldusi ("Sa oskad inimesi tegevustesse haarata..." jms) ÄRA tsiteeri otse — need on testi üldised lõigud, mitte selle konkreetse õpilase tekst. Kasuta neid taustaks, aga argumenteeri valikut õpilase enda sõnade põhjal.
+Sulle antakse tieredCurricula nimekiri:
+- A-tier tähendab tugevat kattuvust õpilase sõnade, valitud valdkondade või märksõnadega.
+- B-tier tähendab osalist kattuvust.
+- C-tier tähendab, et testiprofiil võib suunda pehmelt toetada, aga õpilase enda sõnades on nõrgem seos.
 
-Sinu ülesanne:
-1) Järjesta õppekavad ümber, kombineerides numbrilist eelvalikut kasutaja vabateksti, eesmärkide, siltide ja valitud valdkondadega. Vabateksti ja valdkondade konkreetne kattuvus on tähtsam kui matemaatiline järjestus, kuid numbrid annavad usaldusväärse laia suuna. Eemalda need, mis kasutaja sõnastatud huvidega selgelt ei sobi. Vali maksimaalselt 5 parimat.
-2) Vali extraCourses-listist 1-3 lisakursust, mis toetavad valitud õppekavasid ja kasutaja konkreetseid huve (eelistatult vabateksti ja siltide kattuvuse põhjal).
-3) Kirjuta kasutajale lühike (kuni 4 lauset), soe ja konkreetne põhjendus, miks just need valikud talle sobivad. Maini 1-2 konkreetset teemat tema vabast tekstist või eesmärkidest, et kasutaja tunneks et tema sisendit on loetud. Ära nimeta skoore ega protsente. Kasuta sõnu "võib sobida", "tasub uurida", "paistab", väldi lõplikke väiteid.
+Tee lõplik valik nii:
+1) Eelista õppekavasid, mille sisu kattub otseselt õpilase enda sõnade ja valitud valdkondadega.
+2) Kasuta testScore väärtust ainult nõrga tie-breakerina, taustakontrollina või siis, kui õpilase tekst ja huvivalikud on väga napid.
+3) Kui õpilane nimetab konkreetseid teemasid, siis ära lükka neid kõrvale lihtsalt seetõttu, et mõni testiskaala on madalam või teine testiskaala on kõrgem.
+4) Kui A-tier kandidaat ei sobi sisuliselt õpilase freeTextiga, võid valida B-tier kandidaadi, aga põhjenda seda.
+5) Ära tsiteeri testi tüüpkirjeldusi. Põhjenda õpilase enda sõnade, valitud valdkondade, detectedSignals väärtuste ja õppekava sisuga.
+6) Kui testScore ja signalScore lähevad vastuollu, järgi signalScore'i ning maini vajadusel, et testi tulemus on ainult taust.
+
+Tagasta maksimaalselt 5 õppekava ja 1-3 lisakursust. Iga õppekava ja kursuse juurde kirjuta lühike konkreetne põhjus, miks just see sobib.
 Vasta AINULT JSON-ina kujuga:
-{"curriculaOrder":["kood1","kood2"],"courseLinks":["link1"],"explanation":"..."}.
-Eesti keeles. Kasuta ainult koode, mis on eelvaliku nimekirjas. Kasuta ainult linke, mis on extraCourses-listist.`;
+{
+  "curricula":[{"kood":"12345","reason":"Üks konkreetne lause, mis seob õpilase huvi ja õppekava sisu."}],
+  "courseLinks":[{"link":"https://...","reason":"Üks konkreetne lause, miks kursus on hea järgmine katsetus."}],
+  "explanation":"2-4 lauset üldist loogikat: mis signaalidest alustasid ja kuidas teste taustana kasutasid."
+}
+Eesti keeles. Kasuta ainult koode, mis on tieredCurricula nimekirjas. Kasuta ainult linke, mis on extraCourses nimekirjas.`;
 
 async function callRefiner(payload: ReturnType<typeof buildLlmPayload>) {
   const client = createOpenAIClient();
@@ -188,46 +277,83 @@ async function withTimeout<T>(task: Promise<T>, ms = 25000): Promise<T> {
   }
 }
 
-function pickRefinedCurricula(order: unknown, candidates: CurriculumMatch[]): CurriculumMatch[] {
-  if (!Array.isArray(order)) return candidates.slice(0, 5);
+function pickRefinedCurricula(refined: any, candidates: CurriculumMatch[]): CurriculumMatch[] {
+  const rawList = Array.isArray(refined?.curricula)
+    ? refined.curricula
+    : Array.isArray(refined?.curriculaOrder)
+      ? refined.curriculaOrder
+      : [];
   const byKood = new Map(candidates.map((curriculum) => [curriculum.kood, curriculum]));
   const seen = new Set<string>();
   const picked: CurriculumMatch[] = [];
-  for (const koodValue of order) {
-    const kood = String(koodValue ?? "").trim();
+
+  for (const item of rawList) {
+    const kood = typeof item === "string" ? item.trim() : String(item?.kood ?? "").trim();
     if (!kood || seen.has(kood)) continue;
     const match = byKood.get(kood);
-    if (match) {
-      picked.push(match);
-      seen.add(kood);
-    }
+    if (!match) continue;
+    const reason = typeof item?.reason === "string" && item.reason.trim() ? item.reason.trim() : fallbackCurriculumReason(match);
+    picked.push({ ...match, reason });
+    seen.add(kood);
     if (picked.length >= 5) break;
   }
-  return picked.length > 0 ? picked : candidates.slice(0, 5);
+
+  return picked.length > 0
+    ? picked
+    : candidates.slice(0, 5).map((candidate) => ({ ...candidate, reason: fallbackCurriculumReason(candidate) }));
 }
 
-function pickSuggestedCourses(links: unknown, pool: ExtraCourse[]): CourseSuggestion[] {
-  if (!Array.isArray(links)) return [];
+function pickSuggestedCourses(refined: any, pool: CourseCandidate[]): CourseSuggestion[] {
+  const rawList = Array.isArray(refined?.courseLinks) ? refined.courseLinks : [];
   const byLink = new Map(pool.map((course) => [course.link, course]));
   const out: CourseSuggestion[] = [];
   const seen = new Set<string>();
-  for (const linkValue of links) {
-    const link = String(linkValue ?? "").trim();
+
+  for (const item of rawList) {
+    const link = typeof item === "string" ? item.trim() : String(item?.link ?? "").trim();
     if (!link || seen.has(link)) continue;
     const course = byLink.get(link);
-    if (course) {
-      out.push({ link: course.link, pealkiri: course.pealkiri, sisu: course.sisu, tags: course.tags });
-      seen.add(link);
-    }
+    if (!course) continue;
+    const reason = typeof item?.reason === "string" && item.reason.trim() ? item.reason.trim() : fallbackCourseReason(course);
+    out.push(courseToSuggestion(course, reason));
+    seen.add(link);
     if (out.length >= 3) break;
   }
   return out;
 }
 
-function fallbackCourses(input: RecommendInput, pool: ExtraCourse[]): CourseSuggestion[] {
+function fallbackCurriculumReason(candidate: CurriculumMatch) {
+  if (candidate.matchedSignals.length) {
+    return `Sobib, sest õppekava kattub õpilase märksõnadega ${candidate.matchedSignals.slice(0, 3).join(", ")}; testiprofiil on ainult pehme taustakontroll.`;
+  }
+  return "See on varusoovitus pehme testisignaali põhjal; seda tasub võrrelda õpilase enda täpsemate huvidega.";
+}
+
+function fallbackCourseReason(course: CourseCandidate) {
+  if (course.matchedSignals.length) {
+    return `Hea väike katsetus, sest kursus haakub märksõnadega ${course.matchedSignals.slice(0, 3).join(", ")}.`;
+  }
+  return "Hea katsetus, et valdkonda väiksema sammuga proovida.";
+}
+
+function courseToSuggestion(course: CourseCandidate, reason?: string): CourseSuggestion {
+  return {
+    link: course.link,
+    pealkiri: course.pealkiri,
+    sisu: course.sisu,
+    tags: course.tags,
+    signalScore: course.signalScore,
+    matchedSignals: course.matchedSignals,
+    reason,
+  };
+}
+
+function fallbackCourses(input: RecommendInput, pool: CourseCandidate[]): CourseSuggestion[] {
   const userTags = collectUserKeywords(input);
-  if (userTags.size === 0) return pool.slice(0, 2).map(({ link, pealkiri, sisu, tags }) => ({ link, pealkiri, sisu, tags }));
-  const scored = pool
+  const sorted = [...pool].sort((a, b) => b.signalScore - a.signalScore || a.pealkiri.localeCompare(b.pealkiri, "et-EE"));
+  if (userTags.size === 0) return sorted.slice(0, 2).map((course) => courseToSuggestion(course, fallbackCourseReason(course)));
+
+  const overlapping = sorted
     .map((course) => {
       const overlap = course.tags.reduce(
         (count, tag) => count + (userTags.has(tag.toLocaleLowerCase("et-EE")) ? 1 : 0),
@@ -235,23 +361,20 @@ function fallbackCourses(input: RecommendInput, pool: ExtraCourse[]): CourseSugg
       );
       return { course, overlap };
     })
-    .filter((item) => item.overlap > 0)
-    .sort((a, b) => b.overlap - a.overlap)
+    .filter((item) => item.overlap > 0 || item.course.signalScore > 0)
+    .sort((a, b) => b.course.signalScore - a.course.signalScore || b.overlap - a.overlap)
     .slice(0, 2);
-  return scored.map(({ course }) => ({
-    link: course.link,
-    pealkiri: course.pealkiri,
-    sisu: course.sisu,
-    tags: course.tags,
-  }));
+
+  return (overlapping.length ? overlapping.map((item) => item.course) : sorted.slice(0, 2))
+    .map((course) => courseToSuggestion(course, fallbackCourseReason(course)));
 }
 
 export async function getRecommendations(input: RecommendInput): Promise<RecommendationResponse> {
   const profile = buildProfile(input);
-  const topCurricula = matchTopCurricula(profile, 15);
-  const topFields = matchTopFields(profile, 6);
-
-  const candidateCourses = filterCandidateCourses(input, extraCourses);
+  const extraction = extractUserSignals(input);
+  const topCurricula = matchTopCurricula(profile, extraction, 24);
+  const topFields = matchTopFields(profile, extraction, 6);
+  const candidateCourses = filterCandidateCourses(input, extraCourses, extraction);
 
   if (!topCurricula.length) {
     return {
@@ -259,22 +382,33 @@ export async function getRecommendations(input: RecommendInput): Promise<Recomme
       topFields,
       refinedCurricula: [],
       suggestedCourses: fallbackCourses(input, candidateCourses),
-      explanation: "Profiili põhjal ei õnnestunud õppekavasid sobitada. Proovi täpsustada huve või oskusi.",
+      explanation: "Profiili põhjal ei õnnestunud õppekavasid sobitada. Proovi täpsustada vabas tekstis, mis teemad päriselt huvitavad.",
       source: "math-only",
-      message: "Eval-andmed puuduvad või on profiil tühi.",
+      message: "Eval-andmed puuduvad või profiil on liiga tühi.",
     };
   }
 
-  const payload = buildLlmPayload(input, topCurricula, candidateCourses);
+  const payload = buildLlmPayload(input, extraction, topCurricula, candidateCourses);
+  const started = Date.now();
 
   try {
+    console.log("[api] recommend:refiner-start", {
+      at: new Date().toISOString(),
+      curriculumCandidates: topCurricula.length,
+      courseCandidates: candidateCourses.length,
+      detectedSignals: extraction.signals.length,
+    });
     const refined = await withTimeout(callRefiner(payload));
-    const refinedCurricula = pickRefinedCurricula(refined?.curriculaOrder, topCurricula);
-    const suggestedCourses = pickSuggestedCourses(refined?.courseLinks, candidateCourses);
+    console.log("[api] recommend:refiner-done", {
+      at: new Date().toISOString(),
+      durationMs: Date.now() - started,
+    });
+    const refinedCurricula = pickRefinedCurricula(refined, topCurricula);
+    const suggestedCourses = pickSuggestedCourses(refined, candidateCourses);
     const explanation =
       typeof refined?.explanation === "string" && refined.explanation.trim()
         ? refined.explanation.trim()
-        : "AI selgitust ei saadud, aga matemaatiline sobitus jäi alles.";
+        : "Valik algas õpilase enda tekstist, valitud valdkondadest ja märksõnadest; testitulemusi kasutati ainult pehme taustasobivuse kontrolliks.";
     return {
       topCurricula,
       topFields,
@@ -284,34 +418,65 @@ export async function getRecommendations(input: RecommendInput): Promise<Recomme
       source: "ai",
     };
   } catch (error) {
+    console.log("[api] recommend:refiner-fallback", {
+      at: new Date().toISOString(),
+      durationMs: Date.now() - started,
+      message: error instanceof Error ? error.message : String(error),
+    });
     return {
       topCurricula,
       topFields,
-      refinedCurricula: topCurricula.slice(0, 5),
+      refinedCurricula: topCurricula.slice(0, 5).map((candidate) => ({ ...candidate, reason: fallbackCurriculumReason(candidate) })),
       suggestedCourses: fallbackCourses(input, candidateCourses),
       explanation:
-        "AI peenhäälestus polnud saadaval. Näitame matemaatilise sobitamise tulemust ja siltide järgi valitud kursuseid, et saaksid edasi vaadata.",
+        "AI lõplik ülevaatus polnud saadaval. Näitame signaalipõhist shortlisti: esmalt õpilase tekst, valitud valdkonnad ja märksõnad; testitulemused on ainult pehme taustakontroll.",
       source: "math-only",
-      message: (error as Error).message,
+      message: "AI peenhäälestus võttis liiga kaua, seega näitame kohe signaalipõhist soovituste nimekirja.",
     };
   }
 }
 
-function filterCandidateCourses(input: RecommendInput, pool: ExtraCourse[]): ExtraCourse[] {
+function filterCandidateCourses(input: RecommendInput, pool: ExtraCourse[], extraction: SignalExtraction): CourseCandidate[] {
   const tags = collectUserKeywords(input);
-  if (tags.size === 0) return pool;
   const ranked = pool
-    .map((course) => ({
-      course,
-      overlap: course.tags.reduce(
+    .map((course) => {
+      const signalMatch = scoreTextAgainstSignals(`${course.pealkiri} ${course.sisu} ${course.tags.join(" ")}`, extraction);
+      const tagOverlap = course.tags.reduce(
         (count, tag) => count + (tags.has(tag.toLocaleLowerCase("et-EE")) ? 1 : 0),
         0,
-      ),
-    }))
-    .sort((a, b) => b.overlap - a.overlap);
-  const overlapping = ranked.filter((item) => item.overlap > 0).map((item) => item.course);
-  if (overlapping.length >= 8) return overlapping.slice(0, 40);
-  // Always include some baseline so the LLM can still pick something.
-  const baseline = ranked.slice(0, 12).map((item) => item.course);
-  return Array.from(new Set([...overlapping, ...baseline])).slice(0, 40);
+      );
+      return {
+        ...course,
+        signalScore: Math.min(100, signalMatch.score + tagOverlap * 8),
+        matchedSignals: signalMatch.matchedSignals,
+        matchedBuzzwords: signalMatch.matchedBuzzwords,
+      } satisfies CourseCandidate;
+    })
+    .sort((a, b) => b.signalScore - a.signalScore || a.pealkiri.localeCompare(b.pealkiri, "et-EE"));
+
+  const strong = ranked.filter((course) => course.signalScore > 0);
+  if (strong.length >= 8) return strong.slice(0, 40);
+  return uniqueByLink([...strong, ...ranked.slice(0, 14)]).slice(0, 40);
+}
+
+function uniqueByKood(items: CurriculumMatch[]) {
+  const seen = new Set<string>();
+  const out: CurriculumMatch[] = [];
+  for (const item of items) {
+    if (seen.has(item.kood)) continue;
+    seen.add(item.kood);
+    out.push(item);
+  }
+  return out;
+}
+
+function uniqueByLink(items: CourseCandidate[]) {
+  const seen = new Set<string>();
+  const out: CourseCandidate[] = [];
+  for (const item of items) {
+    if (seen.has(item.link)) continue;
+    seen.add(item.link);
+    out.push(item);
+  }
+  return out;
 }

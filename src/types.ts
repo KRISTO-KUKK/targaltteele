@@ -163,6 +163,11 @@ export type CurriculumMatch = {
   sisu: string;
   url: string | null;
   matchScore: number;
+  testScore?: number;
+  signalScore?: number;
+  tier?: string;
+  matchedSignals?: string[];
+  reason?: string;
 };
 
 export type AmetSample = {
@@ -177,6 +182,8 @@ export type FieldMatch = {
   kirjeldus: string;
   tags: string[];
   matchScore: number;
+  testScore?: number;
+  signalScore?: number;
   sampleAmetid: AmetSample[];
 };
 
@@ -185,6 +192,9 @@ export type CourseSuggestion = {
   pealkiri: string;
   sisu: string;
   tags: string[];
+  signalScore?: number;
+  matchedSignals?: string[];
+  reason?: string;
 };
 
 export type RecommendationResponse = {
