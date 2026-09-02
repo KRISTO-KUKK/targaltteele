@@ -1,17 +1,14 @@
 import OpenAI from "openai";
 import dotenv from "dotenv";
-import path from "node:path";
 
-const runtimeDirectory = typeof __dirname === "string" ? __dirname : process.cwd();
-
-dotenv.config({ path: path.resolve(runtimeDirectory, ".env"), quiet: true });
+dotenv.config({ quiet: true });
 
 export function hasApiKey() {
-  return Boolean(process.env.OPENAI_API_KEY);
+  return Boolean(process.env.OPENAI_API_KEY?.trim());
 }
 
 export function getModel() {
-  return process.env.OPENAI_MODEL || "gpt-5.5";
+  return process.env.OPENAI_MODEL || "gpt-4.1-mini";
 }
 
 export function getOpenAITimeoutMs() {
@@ -20,7 +17,7 @@ export function getOpenAITimeoutMs() {
 }
 
 export function createOpenAIClient() {
-  if (!process.env.OPENAI_API_KEY) return null;
+  if (!hasApiKey()) return null;
   return new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
     maxRetries: 0,

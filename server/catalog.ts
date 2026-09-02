@@ -6,15 +6,15 @@ import {
   getFieldIdsForAmet,
   type Curriculum,
   type Field,
-} from "./dataset";
+} from "./dataset.js";
 import {
   buildProfile,
   collectUserKeywords,
   distanceToScore,
   weightedDistance,
   type ProfileInput,
-} from "./profileMath";
-import { extractUserSignals, scoreTextAgainstSignals, type SignalExtraction } from "./signals";
+} from "./profileMath.js";
+import { extractUserSignals, scoreTextAgainstSignals, type SignalExtraction } from "./signals.js";
 
 export type CatalogInput = ProfileInput & {
   freeText?: string;

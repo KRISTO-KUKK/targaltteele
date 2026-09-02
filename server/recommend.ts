@@ -1,4 +1,4 @@
-import { createOpenAIClient, getModel } from "./openaiClient";
+import { createOpenAIClient, getModel } from "./openaiClient.js";
 import {
   curricula,
   extraCourses,
@@ -9,14 +9,15 @@ import {
   type ExtraCourse,
   type Field,
   type Profile12d,
-} from "./dataset";
-import { buildProfile, collectUserKeywords, distanceToScore, weightedDistance } from "./profileMath";
+} from "./dataset.js";
+import { buildProfile, collectUserKeywords, distanceToScore, weightedDistance } from "./profileMath.js";
 import {
   extractUserSignals,
   scoreTextAgainstSignals,
   summarizeSignals,
   type SignalExtraction,
-} from "./signals";
+} from "./signals.js";
+import { debug } from "./logger.js";
 
 export type RecommendInput = {
   interestScores?: Array<{ key: string; score: number }>;
@@ -392,15 +393,13 @@ export async function getRecommendations(input: RecommendInput): Promise<Recomme
   const started = Date.now();
 
   try {
-    console.log("[api] recommend:refiner-start", {
-      at: new Date().toISOString(),
+    debug("[api] recommend:refiner-start", {
       curriculumCandidates: topCurricula.length,
       courseCandidates: candidateCourses.length,
       detectedSignals: extraction.signals.length,
     });
     const refined = await withTimeout(callRefiner(payload));
-    console.log("[api] recommend:refiner-done", {
-      at: new Date().toISOString(),
+    debug("[api] recommend:refiner-done", {
       durationMs: Date.now() - started,
     });
     const refinedCurricula = pickRefinedCurricula(refined, topCurricula);
@@ -418,8 +417,7 @@ export async function getRecommendations(input: RecommendInput): Promise<Recomme
       source: "ai",
     };
   } catch (error) {
-    console.log("[api] recommend:refiner-fallback", {
-      at: new Date().toISOString(),
+    debug("[api] recommend:refiner-fallback", {
       durationMs: Date.now() - started,
       message: error instanceof Error ? error.message : String(error),
     });

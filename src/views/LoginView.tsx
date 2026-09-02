@@ -4,7 +4,7 @@ export function LoginView({ start }: { start: () => void }) {
   return (
     <section className="hero">
       <div className="heroCopy">
-        <p className="eyebrow">Quiet guidance. Visible next step.</p>
+        <p className="eyebrow">Õpi- ja karjääritee planeerimine</p>
         <h1>Leia järgmine samm oma õpi- ja karjäärirajal.</h1>
         <p className="lead">Teele seob huvid, oskused ja eesmärgid arusaadavaks valikute kaardiks. Mitte rohkem müra, vaid selgem põhjus, miks üks suund sobib.</p>
         <button className="primary" onClick={start}>

@@ -65,7 +65,7 @@ export function EducationView({
   return (
     <section className="stack">
       <div className="sectionTitle">
-        <p className="eyebrow">V08</p>
+        <p className="eyebrow">Õpiteed</p>
         <h1>Edasiõppimisvõimalused</h1>
         <p>Päris õppekavad EHIS-e andmestikust on järjestatud sinu 12-punktise huvi- ja oskuseprofiili järgi (kaalutud Eukleidiline kaugus). Vabateksti märksõnad annavad lisapunkte.</p>
       </div>

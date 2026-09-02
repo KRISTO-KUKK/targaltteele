@@ -1,4 +1,4 @@
-import { interestDimensions, skillDimensions } from "./taxonomy";
+import { interestDimensions, skillDimensions } from "./taxonomy.js";
 
 type LabelMatcher = { key: string; pattern: RegExp };
 

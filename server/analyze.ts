@@ -1,8 +1,9 @@
-import { createOpenAIClient, getModel } from "./openaiClient";
-import { mockFreeText, mockProfile, mockTest } from "./mock";
-import { interestDimensions, normalizeScores, skillDimensions, taxonomyPrompt } from "./taxonomy";
-import { parseTestText } from "./parseTestText";
-import { extractUserSignals } from "./signals";
+import { createOpenAIClient, getModel } from "./openaiClient.js";
+import { fallbackFreeText, fallbackProfile, fallbackTest } from "./fallback.js";
+import { interestDimensions, normalizeScores, skillDimensions, taxonomyPrompt } from "./taxonomy.js";
+import { parseTestText } from "./parseTestText.js";
+import { extractUserSignals } from "./signals.js";
+import { debug } from "./logger.js";
 
 const fallbackMessage = "AI analüüs ei olnud hetkel saadaval. Näidisandmeid ei kasutata; jätkame ainult sinu sisestatud andmetega.";
 const quotaMessage =
@@ -91,11 +92,11 @@ const combinedShape =
   '{"tags":["tervis"],"goals":["leida sobiv suund"],"concerns":["vajab rohkem infot"],"interestScores":[{"key":"sotsiaalne","label":"Sotsiaalne huvi","score":70,"tags":["inimesed"]}],"skillScores":[{"key":"analuus_info","label":"Analüüs ja info mõtestamine","score":68,"tags":["analüüs"]}],"summary":"Lühike kokkuvõte."}';
 
 export async function analyzeTest(kind: "interests" | "skills", text: string) {
-  console.log("[api] analyze-test:start", { at: new Date().toISOString(), kind, textLength: text.length });
-  if (!text.trim()) return mockTest(kind, "Teksti ei olnud piisavalt. Näidisandmeid ei kasutata; palun kleebi testi protsendid tekstina või laadi loetav fail.");
+  debug("[api] analyze-test:start", { kind, textLength: text.length });
+  if (!text.trim()) return fallbackTest(kind, "Teksti ei olnud piisavalt. Näidisandmeid ei kasutata; palun kleebi testi protsendid tekstina või laadi loetav fail.");
 
   const deterministic = parseTestText(kind, text);
-  console.log("[api] analyze-test:parsed", { at: new Date().toISOString(), kind, matchedCount: deterministic.matchedCount });
+  debug("[api] analyze-test:parsed", { kind, matchedCount: deterministic.matchedCount });
   if (deterministic.matchedCount >= 4) {
     const summary =
       kind === "interests"
@@ -112,7 +113,7 @@ export async function analyzeTest(kind: "interests" | "skills", text: string) {
 
   const otherKind = kind === "interests" ? "skills" : "interests";
   const wrongTest = parseTestText(otherKind, text);
-  console.log("[api] analyze-test:wrong-kind-check", { at: new Date().toISOString(), kind, otherKind, matchedCount: wrongTest.matchedCount });
+  debug("[api] analyze-test:wrong-kind-check", { kind, otherKind, matchedCount: wrongTest.matchedCount });
   if (wrongTest.matchedCount >= 4) {
     const expected = kind === "interests" ? "huvide" : "oskuste";
     const received = kind === "interests" ? "oskuste" : "huvide";
@@ -120,7 +121,7 @@ export async function analyzeTest(kind: "interests" | "skills", text: string) {
       scores: [],
       tags: [],
       summary: `Sisestatud tekst paistab olevat ${received} testi tulemus, mitte ${expected} testi tulemus.`,
-      source: "mock" as const,
+      source: "local" as const,
       message: `See paistab olevat ${received} testi tulemus. Palun kleebi see ${received} sammus või kasuta siin ${expected} testi tulemust.`,
     };
   }
@@ -141,7 +142,7 @@ export async function analyzeImageTest(kind: "interests" | "skills", text: strin
 async function analyzeTestContent(kind: "interests" | "skills", content: UserContent) {
   try {
     const started = Date.now();
-    console.log("[api] analyze-test-content:ai-start", { at: new Date().toISOString(), kind });
+    debug("[api] analyze-test-content:ai-start", { kind });
     const shape = kind === "interests" ? interestShape : skillShape;
     const taxonomy = kind === "interests" ? taxonomyPrompt("interest") : taxonomyPrompt("skill");
     const result = await withTimeout(
@@ -150,27 +151,26 @@ async function analyzeTestContent(kind: "interests" | "skills", content: UserCon
         content,
       ),
     );
-    console.log("[api] analyze-test-content:ai-done", { at: new Date().toISOString(), kind, durationMs: Date.now() - started });
+    debug("[api] analyze-test-content:ai-done", { kind, durationMs: Date.now() - started });
     return { ...normalizeTestAnalysis(result, kind), source: "ai" };
   } catch (error) {
-    console.log("[api] analyze-test-content:fallback", { at: new Date().toISOString(), kind, message: error instanceof Error ? error.message : String(error) });
-    return mockTest(kind, fallbackFor(error));
+    debug("[api] analyze-test-content:fallback", { kind, message: error instanceof Error ? error.message : String(error) });
+    return fallbackTest(kind, fallbackFor(error));
   }
 }
 
 export async function analyzeFreeText(text: string) {
   const started = Date.now();
-  console.log("[api] free-text:start", {
-    at: new Date().toISOString(),
+  debug("[api] free-text:start", {
     textLength: text.length,
     hasText: Boolean(text.trim()),
   });
   if (!text.trim()) {
-    console.log("[api] free-text:empty", { at: new Date().toISOString(), durationMs: Date.now() - started });
-    return mockFreeText(text);
+    debug("[api] free-text:empty", { durationMs: Date.now() - started });
+    return fallbackFreeText(text);
   }
   try {
-    console.log("[api] free-text:ai-start", { at: new Date().toISOString() });
+    debug("[api] free-text:ai-start");
     const result = await withTimeout(
       askJson(
         `Analüüsi õpilase vaba teksti karjääri- ja õpitee planeerimise vaatest. Ära diagnoosi. Ära tee lõplikke järeldusi. Õpilase enda sõnad on soovituste kõige tähtsam sisend; testitulemused on hiljem ainult pehme taustsignaal. Lisaks kokkuvõttele tuleta tekstist indikatiivsed huvid ja oskused, et süsteem saaks soovitusi teha ka siis, kui teste ei täideta. ${taxonomyPrompt("combined")} Paiguta kasutaja tekst alati kõige lähemasse olemasolevasse kategooriasse ja ära loo uusi key väärtusi. Kasuta 0-100 skoore ettevaatliku signaalina, mitte testitulemusena. Vasta ainult JSON-ina kujuga ${combinedShape}. Eesti keeles.`,
@@ -178,8 +178,7 @@ export async function analyzeFreeText(text: string) {
       ),
     );
     const normalized = normalizeCombinedAnalysis(result);
-    console.log("[api] free-text:ai-done", {
-      at: new Date().toISOString(),
+    debug("[api] free-text:ai-done", {
       durationMs: Date.now() - started,
       tagCount: normalized.tags.length,
       interestScoreCount: normalized.interestScores.length,
@@ -187,8 +186,7 @@ export async function analyzeFreeText(text: string) {
     });
     return { ...normalized, source: "ai" };
   } catch (error) {
-    console.log("[api] free-text:fallback", {
-      at: new Date().toISOString(),
+    debug("[api] free-text:fallback", {
       durationMs: Date.now() - started,
       message: error instanceof Error ? error.message : String(error),
     });
@@ -255,7 +253,7 @@ function localFreeTextAnalysis(text: string, message?: string) {
     interestScores,
     skillScores,
     summary,
-    source: "mock" as const,
+    source: "local" as const,
     message,
   };
 }
@@ -287,7 +285,7 @@ export async function analyzeProfileSummary(payload: unknown) {
   const started = Date.now();
   const mode = typeof payload === "object" && payload && "mode" in payload ? String((payload as { mode?: unknown }).mode) : "unknown";
   try {
-    console.log("[api] profile-summary:ai-start", { at: new Date().toISOString(), mode });
+    debug("[api] profile-summary:ai-start", { mode });
     const result = await withTimeout(
       askJson(
         `Koosta kasutajale suunatud AI peegeldus sellest, kuidas süsteem tema huvidest, oskustest, tekstist, valdkonnavalikust ja testitulemustest aru sai.
@@ -308,15 +306,14 @@ Vasta ainult JSON-ina kujuga {"summary":"","possibleJobDirections":[],"possibleE
         JSON.stringify(payload),
       ),
     );
-    console.log("[api] profile-summary:ai-done", { at: new Date().toISOString(), mode, durationMs: Date.now() - started });
+    debug("[api] profile-summary:ai-done", { mode, durationMs: Date.now() - started });
     return { ...result, source: "ai" };
   } catch (error) {
-    console.log("[api] profile-summary:fallback", {
-      at: new Date().toISOString(),
+    debug("[api] profile-summary:fallback", {
       mode,
       durationMs: Date.now() - started,
       message: error instanceof Error ? error.message : String(error),
     });
-    return mockProfile(payload, fallbackFor(error));
+    return fallbackProfile(payload, fallbackFor(error));
   }
 }

@@ -73,7 +73,7 @@ export function CoursesView({
   return (
     <section className="stack">
       <div className="sectionTitle">
-        <p className="eyebrow">V07</p>
+        <p className="eyebrow">Lisakursused</p>
         <h1>Kursused</h1>
         <p>Päris lisakursused Eesti ülikoolide ja õppekeskuste andmestikust. Järjestus tugineb sinu sisestatud huvidele, oskustele, vabale tekstile ja siltidele.</p>
       </div>

@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { createOpenAIClient, getModel } from "./openaiClient";
+import { createOpenAIClient, getModel } from "./openaiClient.js";
 
 export type ExtractedTextResult = {
   text: string;

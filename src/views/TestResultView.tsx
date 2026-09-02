@@ -40,24 +40,19 @@ export function TestResultView({
   async function analyze() {
     const activeRequestId = requestId.current + 1;
     requestId.current = activeRequestId;
-    console.info("[test-result] analyze:start", { at: new Date().toISOString(), kind, textLength: text.length, hasFile: Boolean(file), fileName: file?.name });
     setBusy(true);
     setMessage("");
     try {
       const result = await analyzeTest(kind, text, file);
       if (!isMounted.current || requestId.current !== activeRequestId) return;
-      console.info("[test-result] analyze:result", { at: new Date().toISOString(), kind, scoreCount: result.scores.length, source: result.source, message: result.message });
-      setMessage(result.message ?? (result.source === "mock" ? "AI analüüsi ei saanud hetkel teha. Näidisandmeid ei kasutata; palun proovi uuesti või kleebi testi protsendid tekstina." : ""));
+      setMessage(result.message ?? (result.source === "local" ? "AI analüüsi ei saanud hetkel teha. Näidisandmeid ei kasutata; palun proovi uuesti või kleebi testi protsendid tekstina." : ""));
       if (result.scores.length === 0 && result.message) {
-        console.info("[test-result] analyze:staying-on-step", { at: new Date().toISOString(), kind, reason: result.message });
         return;
       }
-      console.info("[test-result] analyze:advance", { at: new Date().toISOString(), kind });
       onDone(result);
     } finally {
       if (isMounted.current && requestId.current === activeRequestId) {
         setBusy(false);
-        console.info("[test-result] analyze:busy-false", { at: new Date().toISOString(), kind });
       }
     }
   }
@@ -68,7 +63,7 @@ export function TestResultView({
       scores: [],
       tags: [],
       summary: kind === "interests" ? "Huvide test jäeti praegu vahele." : "Oskuste test jäeti praegu vahele.",
-      source: "mock",
+      source: "local",
     });
   }
 

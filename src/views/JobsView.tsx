@@ -72,7 +72,7 @@ export function JobsView({
   return (
     <section className="stack">
       <div className="sectionTitle">
-        <p className="eyebrow">V09</p>
+        <p className="eyebrow">Karjäärisuunad</p>
         <h1>Ametid</h1>
         <p>Päris ametid oskused.ee andmebaasist on järjestatud nende töövaldkondade järgi, mis sinu profiilile lähemal on. Iga ametiga on näha valdkonnad, mis seda kõige rohkem kannavad.</p>
       </div>

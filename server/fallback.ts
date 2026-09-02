@@ -1,16 +1,14 @@
-import type { FreeTextAnalysis, ProfileSummary, TestAnalysis } from "../types";
-
-export function mockTestAnalysis(kind: "interests" | "skills", message?: string): TestAnalysis {
+export function fallbackTest(kind: "interests" | "skills", message?: string) {
   return {
     scores: [],
     tags: [],
     summary: kind === "interests" ? "Huvide testi tulemust ei saanud automaatselt tõlgendada." : "Oskuste testi tulemust ei saanud automaatselt tõlgendada.",
-    source: "mock",
+    source: "local",
     message,
   };
 }
 
-export function mockFreeTextAnalysis(text: string, message?: string): FreeTextAnalysis {
+export function fallbackFreeText(text = "", message?: string) {
   const trimmed = text.trim();
   return {
     tags: extractKeywords(trimmed),
@@ -21,12 +19,12 @@ export function mockFreeTextAnalysis(text: string, message?: string): FreeTextAn
     summary: trimmed
       ? `Vaba tekst salvestati. AI kokkuvõtet ei loodud, seega jätkame ainult sinu sisestatud tekstiga: "${trimmed.slice(0, 220)}${trimmed.length > 220 ? "..." : ""}"`
       : "Vaba teksti sammu ei täidetud.",
-    source: "mock",
+    source: "local",
     message,
   };
 }
 
-export function mockProfileSummary(payload?: unknown, message?: string): ProfileSummary {
+export function fallbackProfile(payload?: unknown, message?: string) {
   const profile = readProfile(payload);
   const selectedDomains = Array.isArray(profile?.selectedDomains) ? profile.selectedDomains.filter(Boolean).join(", ") : "";
   const freeText = typeof profile?.freeText === "string" ? profile.freeText.trim() : "";
@@ -40,7 +38,7 @@ export function mockProfileSummary(payload?: unknown, message?: string): Profile
     summary: parts.join(" "),
     possibleJobDirections: [],
     possibleEducationDirections: [],
-    source: "mock",
+    source: "local",
     message,
   };
 }
@@ -52,32 +50,6 @@ function readProfile(payload: unknown): any {
 }
 
 function extractKeywords(text: string) {
-  const lowered = text.toLocaleLowerCase("et-EE");
-  function containsTerm(textValue: string, term: string) {
-    const normalizedTerm = term.toLocaleLowerCase("et-EE");
-    const tokens = textValue.split(/[^a-z0-9õäöüšž]+/i).filter(Boolean);
-    if (normalizedTerm.length <= 3) return tokens.includes(normalizedTerm);
-    return tokens.some((token) => token === normalizedTerm || token.startsWith(normalizedTerm));
-  }
-  const keywords = [
-    "bioloogia",
-    "loomad",
-    "ai",
-    "it",
-    "tervis",
-    "muusika",
-    "ettevõtlus",
-    "ettevotlus",
-    "loovus",
-    "tehnoloogia",
-    "inimesed",
-    "loodus",
-    "rahandus",
-    "investeerimine",
-    "marketing",
-    "turundus",
-    "analyst",
-    "trader",
-  ];
-  return keywords.filter((keyword) => containsTerm(lowered, keyword));
+  const lowered = text.toLowerCase();
+  return ["bioloogia", "loomad", "ai", "it", "tervis", "muusika", "ettevõtlus", "loovus", "tehnoloogia", "inimesed", "loodus"].filter((keyword) => lowered.includes(keyword));
 }

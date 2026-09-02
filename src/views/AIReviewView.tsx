@@ -52,7 +52,6 @@ export function AIReviewView({
       setLoading(true);
       setShowQuestion(false);
       const started = Date.now();
-      console.info("[profile-review] summary:start", { at: new Date().toISOString() });
       const result = await getProfileSummary({
         profile: user,
         mode: "first_reflection",
@@ -63,11 +62,6 @@ export function AIReviewView({
         if (!alive) return;
         setSummary(result);
         setLoading(false);
-        console.info("[profile-review] summary:done", {
-          at: new Date().toISOString(),
-          durationMs: Date.now() - started,
-          hasMessage: Boolean(result.message),
-        });
         if (result.message) onMessage(result.message);
       }, remaining);
     }
@@ -89,8 +83,6 @@ export function AIReviewView({
     if (!trimmedCorrection) return;
     setSubmittingCorrection(true);
     setShowQuestion(false);
-    const started = Date.now();
-    console.info("[profile-review] correction:start", { at: new Date().toISOString(), length: trimmedCorrection.length });
     const result = await getProfileSummary({
       profile: user,
       previousSummary: summary?.summary,
@@ -102,7 +94,6 @@ export function AIReviewView({
     setCorrection("");
     setSubmittingCorrection(false);
     setShowCorrection(false);
-    console.info("[profile-review] correction:done", { at: new Date().toISOString(), durationMs: Date.now() - started });
     if (result.message) onMessage(result.message);
   }
 

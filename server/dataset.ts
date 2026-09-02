@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { warn } from "./logger.js";
 
 const projectRoot = path.resolve(process.cwd());
 
@@ -50,7 +51,7 @@ function safeReadJson<T>(relativePath: string, fallback: T): T {
     const parsed = JSON.parse(raw);
     return parsed as T;
   } catch (error) {
-    console.warn(`[dataset] Failed to read ${relativePath}: ${(error as Error).message}`);
+    warn(`[dataset] Failed to read ${relativePath}: ${(error as Error).message}`);
     return fallback;
   }
 }

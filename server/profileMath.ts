@@ -1,5 +1,5 @@
-import { taxonomy, type Profile12d } from "./dataset";
-import { normalizeForMatch } from "./signals";
+import { taxonomy, type Profile12d } from "./dataset.js";
+import { normalizeForMatch } from "./signals.js";
 
 export const INTEREST_WEIGHT = 1.2;
 export const SKILL_WEIGHT = 1.0;

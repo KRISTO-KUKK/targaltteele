@@ -28,7 +28,7 @@ export function PlansView({
   return (
     <section className="stack">
       <div className="sectionTitle">
-        <p className="eyebrow">V10</p>
+        <p className="eyebrow">Plaanide võrdlus</p>
         <h1>Plaanid A, B ja C</h1>
         <p>Plaanid täituvad jooksvalt sinu valitud kursustest, edasiõppimisvõimalustest ja ametitest.</p>
       </div>

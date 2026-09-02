@@ -24,55 +24,6 @@ export type UserProfile = {
   possibleEducationDirections: string[];
 };
 
-export type Course = {
-  id: string;
-  title: string;
-  type: "valikaine" | "lisakursus" | "veebikursus" | "praktiline tegevus";
-  workload: string;
-  description: string;
-  why: string;
-  develops: string[];
-  tags: string[];
-  domains: string[];
-  interestScores?: ScoreItem[];
-  skillScores?: ScoreItem[];
-};
-
-export type EducationOption = {
-  id: string;
-  code?: string;
-  title: string;
-  school: string;
-  level: string;
-  credits?: number;
-  durationYears?: number;
-  domain?: string;
-  direction?: string;
-  url?: string;
-  description: string;
-  why: string;
-  tags: string[];
-  relatedJobIds: string[];
-  relatedSkills: string[];
-  interestScores?: ScoreItem[];
-  skillScores?: ScoreItem[];
-};
-
-export type Job = {
-  id: string;
-  title: string;
-  description: string;
-  why: string;
-  requiredEducation: string;
-  salaryRange: string;
-  skills: string[];
-  tags: string[];
-  domains: string[];
-  relatedEducationIds: string[];
-  interestScores?: ScoreItem[];
-  skillScores?: ScoreItem[];
-};
-
 export type PlanId = "A" | "B" | "C";
 
 export type PlanEducation = {
@@ -131,7 +82,7 @@ export type TestAnalysis = {
   scores: ScoreItem[];
   tags: string[];
   summary: string;
-  source: "ai" | "mock";
+  source: "ai" | "local";
   message?: string;
   extractedTextFile?: string | null;
   extractedTextMethod?: string;
@@ -144,7 +95,7 @@ export type FreeTextAnalysis = {
   interestScores: ScoreItem[];
   skillScores: ScoreItem[];
   summary: string;
-  source: "ai" | "mock";
+  source: "ai" | "local";
   message?: string;
 };
 
@@ -152,7 +103,7 @@ export type ProfileSummary = {
   summary: string;
   possibleJobDirections: string[];
   possibleEducationDirections: string[];
-  source: "ai" | "mock";
+  source: "ai" | "local";
   message?: string;
 };
 

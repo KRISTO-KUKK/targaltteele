@@ -1,0 +1,13 @@
+.git
+node_modules
+dist
+extracted-text
+.env
+.env.*
+!.env.example
+*.log
+npm-debug.log*
+coverage
+*.tsbuildinfo
+.DS_Store
+.claude

@@ -3,23 +3,23 @@ import dotenv from "dotenv";
 import express from "express";
 import multer from "multer";
 import path from "node:path";
-import { analyzeFreeText, analyzeProfileSummary, analyzeTest } from "./analyze";
-import { extractTextFromUpload } from "./extractText";
-import { mockTest } from "./mock";
-import { getRecommendations, type RecommendInput } from "./recommend";
-import { rankAmetid, rankCourses, rankCurricula, type CatalogInput } from "./catalog";
-import { getOpenAITimeoutMs, probeOpenAI } from "./openaiClient";
+import { analyzeFreeText, analyzeProfileSummary, analyzeTest } from "./analyze.js";
+import { extractTextFromUpload } from "./extractText.js";
+import { fallbackTest } from "./fallback.js";
+import { getRecommendations, type RecommendInput } from "./recommend.js";
+import { rankAmetid, rankCourses, rankCurricula, type CatalogInput } from "./catalog.js";
+import { getOpenAITimeoutMs, hasApiKey, probeOpenAI } from "./openaiClient.js";
+import { debug, info, warn } from "./logger.js";
 
-const runtimeDirectory = typeof __dirname === "string" ? __dirname : process.cwd();
-
-dotenv.config({ path: path.resolve(runtimeDirectory, ".env"), quiet: true });
+dotenv.config({ quiet: true });
 
 const app = express();
 const port = Number(process.env.PORT || 8787);
 const isProduction = process.env.NODE_ENV === "production";
 const allowedOrigin = process.env.ALLOWED_ORIGIN?.split(",").map((origin) => origin.trim()).filter(Boolean);
-const clientDirectory = path.resolve(runtimeDirectory, "dist");
+const clientDirectory = path.resolve(process.cwd(), process.env.CLIENT_DIST_DIR || "dist/client");
 const appBasePath = normalizeBasePath(process.env.APP_BASE_PATH || "");
+const requestLoggingEnabled = process.env.LOG_LEVEL === "debug";
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },
@@ -40,13 +40,15 @@ const apiRouter = express.Router();
 
 apiRouter.use((req, res, next) => {
   const started = Date.now();
-  console.log(`[api] ${req.method} ${req.originalUrl} start`, {
-    at: new Date().toISOString(),
+  if (!requestLoggingEnabled) {
+    next();
+    return;
+  }
+  debug(`[api] ${req.method} ${req.originalUrl} start`, {
     contentType: req.headers["content-type"],
   });
   res.on("finish", () => {
-    console.log(`[api] ${req.method} ${req.originalUrl} done`, {
-      at: new Date().toISOString(),
+    debug(`[api] ${req.method} ${req.originalUrl} done`, {
       status: res.statusCode,
       durationMs: Date.now() - started,
     });
@@ -141,13 +143,17 @@ if (isProduction) {
 }
 
 app.listen(port, () => {
-  console.log(`Targalt teele API server listening on http://127.0.0.1:${port}`);
-  console.log(`[openai] timeout=${getOpenAITimeoutMs()}ms, running startup probe...`);
+  info(`Targalt Teele server listening on port ${port}`);
+  if (!hasApiKey()) {
+    info("OpenAI integration disabled because OPENAI_API_KEY is not set");
+    return;
+  }
+  info(`[openai] timeout=${getOpenAITimeoutMs()}ms, running startup probe...`);
   probeOpenAI().then((result) => {
     if (result.ok) {
-      console.log(`[openai] probe OK: model=${result.model} durationMs=${result.durationMs}`);
+      info(`[openai] probe OK: model=${result.model} durationMs=${result.durationMs}`);
     } else {
-      console.warn(`[openai] probe FAILED: model=${result.model} durationMs=${result.durationMs} message=${result.message ?? "(no message)"}`);
+      warn(`[openai] probe failed: model=${result.model} durationMs=${result.durationMs} message=${result.message ?? "(no message)"}`);
     }
   });
 });
@@ -159,8 +165,7 @@ function normalizeBasePath(value: string) {
 }
 
 async function analyzeUploadedTest(kind: "interests" | "skills", text = "", file?: Express.Multer.File) {
-  console.log("[api] analyze-uploaded-test:start", {
-    at: new Date().toISOString(),
+  debug("[api] analyze-uploaded-test:start", {
     kind,
     textLength: text.length,
     file: file ? { originalname: file.originalname, mimetype: file.mimetype, size: file.size } : null,
@@ -169,7 +174,7 @@ async function analyzeUploadedTest(kind: "interests" | "skills", text = "", file
     const extracted = await extractTextFromUpload(kind, file);
     const combinedText = [text, extracted.text].filter(Boolean).join("\n\n");
     if (!combinedText.trim() && file) {
-      return mockTest(kind, "Fail võeti vastu, aga sellest ei õnnestunud loetavat teksti kätte saada. Proovi tulemuse tekst käsitsi kleepida või laadi selgem pilt.");
+      return fallbackTest(kind, "Fail võeti vastu, aga sellest ei õnnestunud loetavat teksti kätte saada. Proovi tulemuse tekst käsitsi kleepida või laadi selgem pilt.");
     }
     const result = await analyzeTest(kind, combinedText);
     return {
@@ -178,17 +183,16 @@ async function analyzeUploadedTest(kind: "interests" | "skills", text = "", file
       extractedTextMethod: extracted.method,
     };
   } catch (error) {
-    console.log("[api] analyze-uploaded-test:error", {
-      at: new Date().toISOString(),
+    debug("[api] analyze-uploaded-test:error", {
       kind,
       message: error instanceof Error ? error.message : String(error),
     });
     if (file?.mimetype.startsWith("image/")) {
-      return mockTest(kind, "Pildi OCR ei õnnestunud. Proovi selgemat pilti või kleebi tulemuse tekst käsitsi.");
+      return fallbackTest(kind, "Pildi OCR ei õnnestunud. Proovi selgemat pilti või kleebi tulemuse tekst käsitsi.");
     }
     if (file?.mimetype === "application/pdf") {
-      return mockTest(kind, "PDF-i teksti ei õnnestunud välja lugeda. Proovi tulemuse tekst käsitsi kleepida või laadi pilt.");
+      return fallbackTest(kind, "PDF-i teksti ei õnnestunud välja lugeda. Proovi tulemuse tekst käsitsi kleepida või laadi pilt.");
     }
-    return mockTest(kind, "Faili teksti ei õnnestunud töödelda. Proovi tulemuse tekst käsitsi kleepida.");
+    return fallbackTest(kind, "Faili teksti ei õnnestunud töödelda. Proovi tulemuse tekst käsitsi kleepida.");
   }
 }
