@@ -4,10 +4,6 @@ Targalt Teele is a career and learning-path prototype for upper secondary school
 
 The project was built during the AI Leap / Presidential Education Hackathon. Teachers and career specialists explained the domain needs and requirements; I translated those requirements into the technical implementation, built the prototype and handled deployment.
 
-[Screenshot: student profile]
-[Screenshot: recommendations view]
-[Screenshot: plan comparison]
-
 ## Main Features
 
 - Interest and skills input for building a student profile.
